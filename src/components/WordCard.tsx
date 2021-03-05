@@ -175,8 +175,6 @@ const WordCard = (props: WordCardProps) => {
   const defined = ((status === WordStatus.VOTING) || (status === WordStatus.CLOSED));
   const voted = (status === WordStatus.CLOSED);
 
-  console.log('word status: ', status)
-
   useEffect(() => {
     if(defined){ // only runs when defined changes to true (when all definitions provided)
       setShuffled(shuffle((word.definitions) ? word.definitions : []));
@@ -387,7 +385,7 @@ const WordCard = (props: WordCardProps) => {
               value={posing.text}
               placeholder='phony definition'
               onChange={(e) => {
-                setPosing(prev => {return {...prev, text: e.target.value}});
+                setPosing(prev => {return {...prev, text: e.target.value.toLowerCase()}});
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
