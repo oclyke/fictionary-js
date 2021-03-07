@@ -61,10 +61,7 @@ import {
   requestSessionByTag,
 } from './utility/db';
 
-var clipboard = new ClipboardJS('.copybtn');
-clipboard.on('error', function(e) {
-  console.error(e);
-});
+new ClipboardJS('.copybtn');
 
 const useStyles = makeStyles({
   bullet: {
