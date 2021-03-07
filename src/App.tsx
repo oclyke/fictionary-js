@@ -423,7 +423,7 @@ const Start = (props: any) => {
                 oclyke
               </Link>
               {bull}
-              <Link href='https://github.com/oclyke-exploration/fictionary' target='_blank' rel='noreferrer'>
+              <Link href='https://github.com/oclyke-dev/fictionary' target='_blank' rel='noreferrer'>
                 GitHub
               </Link>
             </Typography>
