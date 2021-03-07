@@ -39,7 +39,7 @@ const null_player: PlayerInput = {
 
 const usePlayerCore = (): [React.MutableRefObject<PlayerInput>, (p: PlayerInput) => void] => {
   const player = useRef<PlayerInput>(null_player);
-  const [session_ref] = useSession();
+  const [session_ref,,,setSession] = useSession();
   const session = session_ref.current;
 
   // create the player if they don't have an id
@@ -93,7 +93,7 @@ const usePlayerCore = (): [React.MutableRefObject<PlayerInput>, (p: PlayerInput)
 
         requestUpdateSession(update).then(() => {
           setLocalPlayer(new_player);
-          requestUpdateSession({id}); // do another update to try to trick the system to send another onUpdate subscription event
+          setSession({...initial_session, players});
         }).catch(e => {
           console.error('failed to add player to session! ', e);
         });

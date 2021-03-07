@@ -29,7 +29,7 @@ const null_session: CreateSessionInput = {
   words: [],
 }
 
-const useSessionCore = (): [React.MutableRefObject<CreateSessionInput>, string, React.Dispatch<React.SetStateAction<string>>] => {
+const useSessionCore = (): [React.MutableRefObject<CreateSessionInput>, string, React.Dispatch<React.SetStateAction<string>>, (val: CreateSessionInput) => void] => {
   const [, setCount] = useState<number>(0);
   const [tag, setTag] = useState<string>('');
   const sessionid = useRef<string>('');
@@ -98,7 +98,7 @@ const useSessionCore = (): [React.MutableRefObject<CreateSessionInput>, string, 
     return cleanup;
   }, [tag]);
 
-  return [session, tag, setTag];
+  return [session, tag, setTag, setSession];
 }
 
 export const useSession = () => useBetween(useSessionCore);
