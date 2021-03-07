@@ -105,6 +105,7 @@ const usePlayerCore = (): [React.MutableRefObject<PlayerInput>, (p: PlayerInput)
   // add an event listener to know when the subscription is added - which we will use to add the player to the session
   useEffect(() => {
     window.addEventListener('addsubscription', handleSessionSubscriptionAddition);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // allow the user to make modifications to the player
