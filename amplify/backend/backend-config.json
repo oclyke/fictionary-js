@@ -8,8 +8,8 @@
           "defaultAuthentication": {
             "authenticationType": "API_KEY",
             "apiKeyConfig": {
-              "apiKeyExpirationDays": 21,
-              "description": "public api key"
+              "apiKeyExpirationDays": 7,
+              "description": "fictionary-public"
             }
           },
           "additionalAuthenticationProviders": []
@@ -20,8 +20,8 @@
   "hosting": {
     "amplifyhosting": {
       "service": "amplifyhosting",
-      "type": "cicd",
-      "lastPushTimeStamp": "2021-03-04T23:56:20.704Z"
+      "providerPlugin": "awscloudformation",
+      "type": "manual"
     }
   }
 }
