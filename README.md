@@ -6,6 +6,6 @@ its a fun game yo
 
 ## how it works:
 
-back end: AWS amplify w/ GraphQL schema accessing DynamoDB stores
-front end: containerized React PWA (this repo)
-distribution: digitalocean kubernetes cluster
+* front end: containerized React PWA (this repo, image at [oclykedev/fictionary](https://hub.docker.com/r/oclykedev/fictionary))
+* back end: AWS amplify w/ GraphQL schema accessing DynamoDB stores
+* deployment: digitalocean kubernetes cluster
