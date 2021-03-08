@@ -371,7 +371,7 @@ const Start = (props: any) => {
                   <IconButton color='primary' size='small'>
                     <SendRoundedIcon />
                   </IconButton>
-                  <span>add made-up definitions to other player's words</span>
+                  <span>add made-up definitions to other players' words</span>
                 </li>
                 <li>
                   {/* radio button */}
