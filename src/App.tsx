@@ -61,6 +61,8 @@ import {
   requestSessionByTag,
 } from './utility/db';
 
+import { version } from './ver';
+
 new ClipboardJS('.copybtn');
 
 const useStyles = makeStyles({
@@ -422,6 +424,10 @@ const Start = (props: any) => {
               {bull}
               <Link href='https://github.com/oclyke-dev/fictionary' target='_blank' rel='noreferrer'>
                 GitHub
+              </Link>
+              {bull}
+              <Link href='' target='_blank' rel='noreferrer'>
+                v{version}
               </Link>
             </Typography>
           </Sluicebox>
