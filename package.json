@@ -1,0 +1,8 @@
+{
+  "name": "fictionary",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "https://github.com/oclyke-dev/fictionary.git",
+  "author": "oclyke",
+  "license": "MIT"
+}
