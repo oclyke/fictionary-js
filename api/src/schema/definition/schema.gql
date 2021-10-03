@@ -1,0 +1,61 @@
+type Query {
+  getSession(
+    id: ID!
+  ): Session
+}
+
+type Mutation {
+  createSession(
+    input: SessionInput
+  ): Session
+
+  addPlayer(
+    session_id: ID!
+    input: PlayerInput
+  ): Player
+  # addWord(
+  #   input: AddWordInput
+  # ): Session
+}
+
+type Player {
+  id: ID!
+  name: String!
+  color: String!
+}
+
+input PlayerInput {
+  name: String
+  color: String
+}
+
+type Definition {
+  id: ID!
+  text: String!
+  author_id: String!
+  voter_ids: [String!]!
+}
+
+enum WordStatus {
+  NONE
+}
+
+type Word {
+  id: ID!
+  text: String!
+  author_id: String!
+  comittee_ids: [String!]!
+  definitions: [Definition!]!
+  status: WordStatus!
+}
+
+type Session {
+  id: ID!
+  tag: String!
+  players: [Player!]!
+  words: [Word!]!
+}
+
+input SessionInput {
+  tag: String
+}

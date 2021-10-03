@@ -1,0 +1,11 @@
+# build
+dist
+
+# node
+node_modules
+
+# temporary files
+src/schema/temp/**
+
+# local secrets
+.env
