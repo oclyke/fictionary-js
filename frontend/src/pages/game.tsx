@@ -150,7 +150,7 @@ const Component = withRouter(({ history }) => {
       <Divider style={{marginLeft: '8px', marginRight: '8px'}}/>
 
       {/* words */}
-      {/* <Box flexGrow={1} style={{overflow: 'auto'}}>
+      <Box flexGrow={1} style={{overflow: 'auto'}}>
         <Sluicebox>
           <Box display='flex' flexDirection='column'>
             {room.words && room.words.map((word, idx) => { return <>
@@ -160,7 +160,7 @@ const Component = withRouter(({ history }) => {
             </>})}
           </Box>
         </Sluicebox>
-      </Box> */}
+      </Box>
 
       {/* suggestions */}
       <Box display={'flex'}>

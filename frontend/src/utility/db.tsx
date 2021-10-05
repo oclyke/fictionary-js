@@ -1,6 +1,6 @@
 import {
   gqlop,
-} from '.';
+} from './graphql';
 
 // import {
 //   GQLUser,

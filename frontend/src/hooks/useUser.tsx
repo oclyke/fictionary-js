@@ -9,7 +9,7 @@ import {
 
 import {
   useRoom,
-} from '.';
+} from './useRoom';
 
 import {
   suggestId,

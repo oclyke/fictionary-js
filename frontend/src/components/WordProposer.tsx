@@ -77,7 +77,9 @@ const WordProposer = (props: WordProposerProps) => {
       <Paper style={{backgroundColor: 'whitesmoke'}}>
         <Box p={1} display='flex'>
           <Box>
-            <TextField 
+            {/* note: snowpack seems to be having an issue with TextField... temporarily providing a stand-in input field */}
+            <input onChange={(e) => { console.log(e.target.value); }}/>
+            {/* <TextField 
               // value={word.text}
               label='new word'
               onChange={(e) => {
@@ -90,7 +92,7 @@ const WordProposer = (props: WordProposerProps) => {
                   // }
                 }
               }}
-            />
+            /> */}
           </Box>
           <Divider orientation="vertical" style={{height: '100%', margin: 4}}/>
           <Box flexGrow={1}>
