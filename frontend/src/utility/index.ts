@@ -10,9 +10,10 @@ export {
   makeRoom,
   createUser,
   updateUser,
+  getUser,
 } from './db';
 
 export {
-  setLocalUser,
-  getLocalUser,
+  setLocalUserId,
+  getLocalUserId,
 } from './local';

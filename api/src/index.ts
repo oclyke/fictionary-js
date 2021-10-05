@@ -56,6 +56,7 @@ const unregister = (ws: ExtendedWebSocket) => {
         debug.warn('at this point the database should have the current session removed');
 
         if (typeof ws.roomID === 'undefined') {
+          return;
           throw new Error('cannot remove session with undefined tag');
         }
 

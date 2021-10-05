@@ -6,6 +6,10 @@ type Query {
     id: ID
     tag: String
   ): Room
+
+  getUser(
+    id: ID!
+  ): User
 }
 
 type Mutation {

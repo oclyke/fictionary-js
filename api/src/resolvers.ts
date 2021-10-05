@@ -75,6 +75,16 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       const [base] = await cursor.toArray();
       return new Room(base._id, { mongo: base }).toGQL();
     },
+
+    getUser: async (parent, args) => {
+      const query = {
+        _id: new ObjectID(args.id),
+      };
+      const cursor = await collections.users().find(query, {});
+      if (await cursor.count() !== 1) { return null; }
+      const [base] = await cursor.toArray();
+      return new User(base._id, { mongo: base }).toGQL();
+    },
   },
   Mutation: {
     makeRoom: async (parent, args) => {

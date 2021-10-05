@@ -11,13 +11,15 @@ import {
 import {
   roomByID,
   makeRoom,
-} from '../utility';
+} from '../../utility';
 
-class Room {
-  _id: undefined;
-  constructor(arg?: any, arg2?: any){
-  }
-}
+import {
+  Room,
+} from './classes';
+
+export {
+  Room,
+} from './classes';
 
 const fictionary_ws_endpoint = 'ws://localhost:4001';
 
@@ -39,13 +41,13 @@ const useRoomCore = (): [Room, (tag: string) => void, () => void] => {
       s.addEventListener('open', async (event) => {
         const r = await makeRoom(tag);        // get room or create if nonexistent
         s.send(r.id);                         // register this connection against this room
-        setRoom(new Room(r.id, { gql: r }));  // update room state
+        setRoom(new Room(r.id, r));           // update room state
         id.current = r.id;                    // update id ref
       });
       s.addEventListener('message', async (event) => {
         // when the server send a message it is simply a force-refresh of room state
         const r = await roomByID(id.current);
-        setRoom(new Room(r.id, { gql: r }));
+        setRoom(new Room(r.id, r));
       });
       socket.current = s;
     }

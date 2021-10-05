@@ -1,30 +1,12 @@
-const PLAYER_KEY = 'player';
+const PLAYERID_KEY = 'playerid';
 
-type GQLUser = any;
-class User {
-  _id = undefined
-  constructor(arg?: any, arg2?: any){
-  }
-  fromGQL(p: Partial<GQLUser>){
-    return this;
-  }
+export const getLocalUserId = () => {
+  return localStorage.getItem(PLAYERID_KEY);
 }
 
-export const getLocalUser = (): (User | null) => {
-  const s = localStorage.getItem(PLAYER_KEY);
-  if(s){
-    const obj = JSON.parse(s);
-    if((typeof(obj.name) === 'string') && (typeof(obj.color) === 'string')){
-      const base: Partial<GQLUser> = {
-        name: obj.name,
-        color: obj.color,
-      }
-      return new User(undefined, { gql: base });
-    }
+export const setLocalUserId = (id: string) => {
+  if(typeof id === 'undefined') {
+    throw new Error('bad to set id as undefined locally!')
   }
-  return null;
-}
-
-export const setLocalUser = (player: User) => {
-  localStorage.setItem(PLAYER_KEY, JSON.stringify(player));
+  localStorage.setItem(PLAYERID_KEY, id);
 }

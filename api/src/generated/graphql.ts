@@ -13,6 +13,7 @@ export type Scalars = {
   Float: number;
   IntDict: any;
   StringDict: any;
+  /** The `Upload` scalar type represents a file upload. */
   Upload: any;
 };
 
@@ -60,12 +61,18 @@ export type MutationUpdateUserArgs = {
 export type Query = {
   __typename?: 'Query';
   getRoom: Maybe<Room>;
+  getUser: Maybe<User>;
 };
 
 
 export type QueryGetRoomArgs = {
   id: Maybe<Scalars['ID']>;
   tag: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetUserArgs = {
+  id: Scalars['ID'];
 };
 
 export type Room = {
@@ -291,6 +298,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomArgs, never>>;
+  getUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
 };
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
