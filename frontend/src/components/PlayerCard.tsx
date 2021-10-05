@@ -16,38 +16,44 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { SliderPicker } from 'react-color'
 
 import {
-  PlayerInput,
-} from './../API';
+  useUser,
+} from '../hooks';
 
-import { useSession } from './../hooks/useSession';
-import {
-  computeScore,
-} from './../utility/interactions';
+type GQLUser = any;
+class User {
+  _id = undefined
+  constructor(arg?: any, arg2?: any){
+  }
+  fromGQL(p: Partial<GQLUser>){
+    return this;
+  }
+}
 
 type PlayerCardProps = {
-  player: PlayerInput,
-  editable: boolean,
-  onPlayerChange: (to: PlayerInput) => void
+  player: User,
 }
 
 const PlayerCard = (props: PlayerCardProps) => {
+  const [user, updateUser] = useUser();
   const player = props.player;
-  const [session_ref] = useSession();
-  const session = session_ref.current;
 
-  const [editing, setEditing] = useState<boolean>(false);
+  const [want_editing, setEditing] = useState<boolean>(false);
   const [idchanged, setIdChanged] = useState<boolean>(false);
   const [newcolor, setNewColor] = useState('#7540bf'); // solve the white color bug by using one of the output colors from the slider chooser as initial state
   const [newid, setNewId] = useState('');
   const confirmEdits = () => {
-    let to: PlayerInput = {...player};
+    let to = { ...player };
     if(idchanged){
       to.name = newid;
     }
-    props.onPlayerChange(to);
+    // props.onPlayerChange(to);
+    updateUser(to);
   }
-
-  const score = computeScore(session, player);
+  
+  console.error('todo: get player score from room state');
+  const score = 666;
+  const editable = player._id === user._id;
+  const editing = editable && want_editing;
 
   return <>
     <Box p={1}>
@@ -60,13 +66,13 @@ const PlayerCard = (props: PlayerCardProps) => {
         <Box display='flex' flexDirection='row' alignItems='center' justifyContent='space-between'>
 
           {/* score + id */}
-          {(!editing || !props.editable) && <>
+          {(!editing || !editable) && <>
             <Typography style={{paddingLeft: '8px', paddingTop: '4px', paddingBottom: '4px'}}>
               {`${(((score) ? score : 0) > 0) ? '+' : ''}${score} : `}{player.name}
             </Typography> </>}
 
           {/* id edit input */}
-          {props.editable && editing && <>
+          {editing && <>
             <Box flexGrow={1} style={{marginLeft: '8px'}}>
               <InputBase
                 fullWidth
@@ -98,7 +104,7 @@ const PlayerCard = (props: PlayerCardProps) => {
           </>}
 
           {/* edit / accept toggle button */}
-          {props.editable && <>
+          {editable && <>
             <Box>
               <Tooltip title={(editing) ? 'accept changes' : 'edit player'}>
                 <IconButton
@@ -125,7 +131,7 @@ const PlayerCard = (props: PlayerCardProps) => {
     </Box>
 
     {/* color selector */}
-    {props.editable && editing && <>
+    {editing && <>
       <Box p={1}>
         <SliderPicker
           color={newcolor}
@@ -133,12 +139,9 @@ const PlayerCard = (props: PlayerCardProps) => {
             setNewColor(c.hex);
           }}
           onChangeComplete={(c) => {
-
-            console.log(c)
-
             let to = {...player};
             to.color = c.hex;
-            props.onPlayerChange(to);
+            updateUser(to);
           }}
         />
       </Box> </>}

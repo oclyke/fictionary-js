@@ -31,54 +31,31 @@ import {
 } from '../components';
 
 import {
-  usePlayer,
-  useSession,
+  useUser,
+  playersIdentical,
+  useRoom,
 } from '../hooks';
 
-import {
-  requestDeleteSession,
-  requestUpdateSession,
-  sortPlayers,
-} from '../utility';
-
-import {
-  CreateSessionInput,
-  UpdateSessionInput,
-} from '../API';
+type GQLUser = any;
+class User {
+  _id = undefined
+  constructor(arg?: any, arg2?: any){
+  }
+  fromGQL(p: Partial<GQLUser>){
+    return this;
+  }
+}
 
 const Component = withRouter(({ history }) => {
   const { _tag } = useParams<{_tag: string}>();
-  
-  const [player_ref, setPlayer] = usePlayer();
-  const [session_ref, tag, setTag] = useSession();
-  const player = player_ref.current;
-  const session = session_ref.current;
-
-  const leaveSession = async () => {
-    if(typeof(session_ref.current.id) === 'undefined' || session_ref.current.id === null){
-      console.log(session_ref.current.id);
-      throw new Error('cannot leave a session without an id');
-    }
-
-    const others = session_ref.current.players?.filter(p => p.id !== player_ref.current.id);
-    if(typeof(others) === 'undefined' || others.length === 0){
-      console.warn('deleting session', session_ref.current.id)
-      await requestDeleteSession(session_ref.current.id);
-    }else{
-      console.warn('removing player', player_ref.current, others);
-      const update: UpdateSessionInput = {
-        id: session_ref.current.id,
-        players: others
-      }
-      await requestUpdateSession(update);
-    }
-  }
+  const [user, updateUser] = useUser();
+  const [room, joinRoom, leaveRoom] = useRoom();
 
   // an effect that runs on first render
   useEffect(() => {
     window.addEventListener('beforeunload', (e) => {
       console.log('unloading window - disconnecting user');
-      leaveSession();
+      leaveRoom();
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -86,13 +63,13 @@ const Component = withRouter(({ history }) => {
   // an effect when the user navigates
   useEffect(() => history.listen(() => {
     console.log('user is leaving the page!')
-    leaveSession();
+    leaveRoom();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [])
 
   // ensure tag is up to date
-  if(tag !== _tag){
-    setTag(_tag);
+  if(room.tag !== _tag){
+    joinRoom(_tag);
   }
 
   const narrowscreen = !useMediaQuery('(min-width:450px)');
@@ -100,31 +77,34 @@ const Component = withRouter(({ history }) => {
   let rootroute = useRouteMatch();
   const shareurl = `https://games.oclyke.dev${rootroute.url}`;
 
-
-  const getPlayerItemWidth = (session: CreateSessionInput) => {
-    let playeritemwidth: 2 | 3 | 4 | 6 = 2;
-    let playeritemdivision = 0;
-    if(session.players){
-      playeritemdivision = 12/session.players.length;
+  const getPlayerItemWidth = (room: Room) => {
+    let useritemwidth: 2 | 3 | 4 | 6 = 2;
+    let useritemdivision = 0;
+    if(room.players){
+      useritemdivision = 12/room.players.length;
     }
-    if(playeritemdivision >= 3){
-      playeritemwidth = 3;
+    if(useritemdivision >= 3){
+      useritemwidth = 3;
     }
-    if(playeritemdivision >= 4){
-      playeritemwidth = 4;
+    if(useritemdivision >= 4){
+      useritemwidth = 4;
     }
-    if(playeritemdivision >= 6){
-      playeritemwidth = 6;
+    if(useritemdivision >= 6){
+      useritemwidth = 6;
     }
-    return playeritemwidth;
+    return useritemwidth;
   }
 
 
-  // make an ordered players list
-  const ordered_players = sortPlayers(session, player);
+  // // make an ordered users list
+  // const room_has_users = ((typeof room.users !== 'undefined') && (room.users !== null));
+  // console.log(room_has_users);
+  // const sorted_users = [user, ...((room_has_users) ? [] : room.users.filter(p => !usersIdentical(p, user)).sort((a, b) => b.score - a.score))];
+  // console.log(sorted_users)
+  const sorted_users = [user];
 
   return <>
-    {/* flexbox for header-players-words-suggestions */}
+    {/* flexbox for header-users-words-suggestions */}
     <Box display='flex' flexDirection='column' justifyContent='space-between' style={{width: '100%', height: '100%'}}>
 
       {/* header */}
@@ -135,7 +115,7 @@ const Component = withRouter(({ history }) => {
           </Link>
           {!narrowscreen &&
           <span style={{fontSize: 16, marginLeft: '24px', position: 'relative', top: '-4px'}}>
-            {tag}
+            {room.tag}
           </span>}
           <Tooltip title='copy game link'>
             <IconButton
@@ -150,34 +130,37 @@ const Component = withRouter(({ history }) => {
         </Typography>
       </Container>
 
-      {/* players */}
+      {/* users */}
       <Box p={1} style={{paddingTop: 0, paddingBottom: 0}}>
         <Grid item container>
-          {(ordered_players !== null) && ordered_players.map((player_mapped, idx) => { return <>
-            <Grid item xs={getPlayerItemWidth(session)} key={`player.${idx}.${player_mapped.id}.info`}>
+          {sorted_users.map((user_mapped, idx) => {return <React.Fragment key={`user.${idx}.${user_mapped._id}.info`}>
+            <Grid item xs={getPlayerItemWidth(room)} >
               <PlayerCard 
-                player={player_mapped}
-                editable={player_mapped.id === player.id}
-                onPlayerChange={(to) => { setPlayer(to); }}
+                player={user_mapped}
+                // editable={user_mapped.id === user.id}
+                // onPlayerChange={(to) => {
+                //   // console.log(to);
+                //   updateUser(to);
+                // }}
               />
             </Grid> 
-          </>})}
+          </React.Fragment>})}
         </Grid>
       </Box>
       <Divider style={{marginLeft: '8px', marginRight: '8px'}}/>
 
       {/* words */}
-      <Box flexGrow={1} style={{overflow: 'auto'}}>
+      {/* <Box flexGrow={1} style={{overflow: 'auto'}}>
         <Sluicebox>
           <Box display='flex' flexDirection='column'>
-            {session.words && session.words.map((word, idx) => { return <>
-              <Box key={`words.${idx}.${word.id}`} style={{alignSelf: `flex-${(word.author === player.id) ? 'end' : 'start'}`}}>
+            {room.words && room.words.map((word, idx) => { return <>
+              <Box key={`words.${idx}.${word.id}`} style={{alignSelf: `flex-${(word.author === user.id) ? 'end' : 'start'}`}}>
                 <WordCard word={word} />
               </Box> 
             </>})}
           </Box>
         </Sluicebox>
-      </Box>
+      </Box> */}
 
       {/* suggestions */}
       <Box display={'flex'}>

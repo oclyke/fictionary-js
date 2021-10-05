@@ -12,6 +12,9 @@ import {
 
 const dev = (process.env.NODE_ENV === 'development')
 
+const DEV_PORT = 3000;
+const DEV_PATH = 'fictionary';
+
 const template = async ({
   attributes,
   files,
@@ -65,6 +68,7 @@ export default {
   },
   plugins: [
     replace({
+      preventAssignment: true,
 			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
 		}),
     resolve(),
@@ -81,13 +85,21 @@ export default {
       template,
     }),
     dev && serve({
-      open: true,
+      open: false, // whether to open in browser (sadly it always opens a new tab which is annoying me so I prefer to manually navigate to hosting location)
       verbose: true,
       contentBase: ['', 'dist'],
       historyApiFallback: true,
       host: 'localhost',
-      port: 3000
+      port: DEV_PORT,
+      onListening: function (server) {
+        const protocol = 'http';
+        const host = 'localhost';
+        const address = {
+          port: DEV_PORT,
+        }
+        console.log(`Server listening at ${protocol}://${host}:${address.port}/${DEV_PATH}`)
+      },
     }),
-    livereload({ watch: 'dist' }),
+    // livereload({ watch: 'dist' }),
   ]
 };

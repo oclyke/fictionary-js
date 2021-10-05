@@ -1,39 +1,44 @@
+scalar IntDict
+scalar StringDict
+
 type Query {
-  getSession(
-    id: ID!
-  ): Session
+  getRoom(
+    id: ID
+    tag: String
+  ): Room
 }
 
 type Mutation {
-  createSession(
-    input: SessionInput
-  ): Session
+  makeRoom(
+    tag: String!
+  ): Room
 
-  addPlayer(
-    session_id: ID!
-    input: PlayerInput
-  ): Player
-  # addWord(
-  #   input: AddWordInput
-  # ): Session
+  createUser(
+    input: UserInput
+  ): User
+
+  updateUser(
+    id: ID!
+    input: UserInput!
+  ): User
 }
 
-type Player {
+type User {
   id: ID!
-  name: String!
-  color: String!
+  name: String
+  color: String
 }
 
-input PlayerInput {
+input UserInput {
   name: String
   color: String
 }
 
 type Definition {
   id: ID!
-  text: String!
-  author_id: String!
-  voter_ids: [String!]!
+  author: ID
+  text: String
+  voters: [ID!]
 }
 
 enum WordStatus {
@@ -42,20 +47,22 @@ enum WordStatus {
 
 type Word {
   id: ID!
-  text: String!
-  author_id: String!
-  comittee_ids: [String!]!
-  definitions: [Definition!]!
-  status: WordStatus!
+  text: String
+  author: ID
+  comittee: [ID!]
+  definitions: [Definition!]
+  status: WordStatus
 }
 
-type Session {
+type Room {
   id: ID!
-  tag: String!
-  players: [Player!]!
-  words: [Word!]!
+  tag: String
+  players: [ID!]
+  words: [Word!]
+  scores: IntDict
+  colors: StringDict
 }
 
-input SessionInput {
+input RoomInput {
   tag: String
 }

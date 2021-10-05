@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /*
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.md', which is part of this source code package.
@@ -9,33 +10,37 @@ import {
 
 import {
   Definition,
+  MongoDefinition,
 } from '.';
 
 import {
   Word as GQLWord,
   WordStatus as GQLWordStatus,
-  Definition as GQLDefinition,
-  Scalars as GQLScalars,
 } from '../../generated/graphql';
 
-type BaseType = {
-  author_id?: string | GQLScalars['String'],
-  text?: string | GQLScalars['String'],
-  definitions?: Definition[] | GQLDefinition[],
-  comittee_ids?: string[] | GQLScalars['String'][],
-  status?: GQLWordStatus,
+export {
+  Word as GQLWord,
+} from '../../generated/graphql';
+
+export type MongoWord = {
+  _id: ObjectID,
+  author: string | null,
+  text: string | null,
+  definitions: MongoDefinition[] | null,
+  comittee: string[] | null,
+  status: GQLWordStatus | null,
 }
 
 class Word {
-  readonly _id?: ObjectID = undefined;
-  private author_id = '';
-  private text = '';
-  private definitions: Definition[] = [];
-  private comittee_ids: string[] = [];
-  private status: GQLWordStatus = GQLWordStatus.None;
+  _id?: ObjectID = undefined;
+  author: string | null = null;
+  text: string | null = null;
+  definitions: Definition[] | null = null;
+  comittee: string[] | null = null;
+  status: GQLWordStatus | null = GQLWordStatus.None;
 
   // class methods will not be preserved in storage
-  constructor(id?: string | ObjectID, base?: BaseType) {
+  constructor(id?: string | ObjectID, base?: {mongo?: Partial<MongoWord>, gql?: Partial<GQLWord>}) {
     if (id) {
       if (id instanceof ObjectID) {
         this._id = id;
@@ -44,18 +49,30 @@ class Word {
       }
     }
     if (base) {
-      this.#copyBase(base);
+      if (base.gql) {
+        this.fromGQL(base.gql);
+      }
+      if (base.mongo) {
+        this.fromMongoDB(base.mongo);
+      }
     }
   }
 
-  #copyBase(base: BaseType): void {
-    if (typeof base.author_id !== 'undefined') { this.author_id = base.author_id; }
-    if (typeof base.text !== 'undefined') { this.text = base.text; }
-    if (typeof base.definitions !== 'undefined') { this.definitions = base.definitions.map((d) => ((d instanceof Definition) ? d : new Definition(d.id, d))); }
+  fromGQL(gql: Partial<GQLWord>): Word {
+    if (typeof gql.author !== 'undefined') { this.author = gql.author; }
+    if (typeof gql.text !== 'undefined') { this.text = gql.text; }
+    if (typeof gql.definitions !== 'undefined') { this.definitions = (gql.definitions !== null) ? gql.definitions.map((d) => new Definition(d.id, { gql: d })) : null; }
+    if (typeof gql.comittee !== 'undefined') { this.comittee = gql.comittee; }
+    if (typeof gql.status !== 'undefined') { this.status = gql.status; }
+    return this;
   }
 
-  set(base: BaseType): Word {
-    this.#copyBase(base);
+  fromMongoDB(mongo: Partial<MongoWord>): Word {
+    if (typeof mongo.author !== 'undefined') { this.author = mongo.author; }
+    if (typeof mongo.text !== 'undefined') { this.text = mongo.text; }
+    if (typeof mongo.definitions !== 'undefined') { this.definitions = (mongo.definitions !== null) ? mongo.definitions.map((d) => new Definition(d._id, { mongo: d })) : null; }
+    if (typeof mongo.comittee !== 'undefined') { this.comittee = mongo.comittee; }
+    if (typeof mongo.status !== 'undefined') { this.status = mongo.status; }
     return this;
   }
 
@@ -63,11 +80,35 @@ class Word {
     return {
       id: this._id.toHexString(),
       text: this.text,
-      author_id: this.author_id,
-      comittee_ids: this.comittee_ids,
-      definitions: this.definitions.map((d) => (d.toGQL())),
+      author: this.author,
+      comittee: this.comittee,
+      definitions: (this.definitions !== null) ? this.definitions.map((d) => (d.toGQL())) : null,
       status: this.status,
     };
+  }
+
+  toMongoDB(): MongoWord {
+    return {
+      _id: this._id,
+      text: this.text,
+      author: this.author,
+      definitions: (this.definitions) ? this.definitions.map((d) => d.toMongoDB()) : null,
+      comittee: this.comittee,
+      status: this.status,
+    };
+  }
+
+  static gqlFields(): string {
+    return `
+      id
+      text
+      author
+      comittee
+      status
+      definitions {
+        ${Definition.gqlFields()}
+      }
+    `;
   }
 }
 

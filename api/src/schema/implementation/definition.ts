@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /*
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.md', which is part of this source code package.
@@ -9,24 +10,28 @@ import {
 
 import {
   Definition as GQLDefinition,
-  Scalars as GQLScalars,
 } from '../../generated/graphql';
 
-type BaseType = {
-  author_id?: string | GQLScalars['String'],
-  text?: string | GQLScalars['String'],
-  voter_ids?: string[] | GQLScalars['String'][],
+export {
+  Definition as GQLDefinition,
+} from '../../generated/graphql';
+
+export type MongoDefinition = {
+  _id: ObjectID,
+  author: string | null,
+  text: string | null,
+  voters: string[] | null,
 }
 
 class Definition {
   // bare properties will be persisted in storage
-  readonly _id?: ObjectID = undefined;
-  private author_id = '';
-  private text = '';
-  private voter_ids: string[] = [];
+  readonly _id: ObjectID = undefined;
+  author: string | null = null;
+  text: string | null = null;
+  voters: string[] | null = null;
 
   // class methods will not be preserved in storage
-  constructor(id?: string | ObjectID, base?: BaseType) {
+  constructor(id?: string | ObjectID, base?: { mongo?: Partial<MongoDefinition>, gql?: Partial<GQLDefinition> }) {
     if (id) {
       if (id instanceof ObjectID) {
         this._id = id;
@@ -35,28 +40,54 @@ class Definition {
       }
     }
     if (base) {
-      this.#copyBase(base);
+      if (base.mongo) {
+        this.fromMongoDB(base.mongo);
+      }
+      if (base.gql) {
+        this.fromGQL(base.gql);
+      }
     }
   }
 
-  #copyBase(base: BaseType): void {
-    if (typeof base.author_id !== 'undefined') { this.author_id = base.author_id; }
-    if (typeof base.text !== 'undefined') { this.text = base.text; }
-    if (typeof base.voter_ids !== 'undefined') { this.voter_ids = base.voter_ids; }
+  fromGQL(gql: Partial<GQLDefinition>): Definition {
+    if (typeof gql.author !== 'undefined') { this.author = gql.author; }
+    if (typeof gql.text !== 'undefined') { this.text = gql.text; }
+    if (typeof gql.voters !== 'undefined') { this.voters = gql.voters; }
+    return this;
   }
 
-  set(base: BaseType): Definition {
-    this.#copyBase(base);
+  fromMongoDB(mongo: Partial<MongoDefinition>): Definition {
+    if (typeof mongo.author !== 'undefined') { this.author = mongo.author; }
+    if (typeof mongo.text !== 'undefined') { this.text = mongo.text; }
+    if (typeof mongo.voters !== 'undefined') { this.voters = mongo.voters; }
     return this;
   }
 
   toGQL(): GQLDefinition {
     return {
       id: this._id.toHexString(),
-      author_id: this.author_id,
+      author: this.author,
       text: this.text,
-      voter_ids: this.voter_ids,
+      voters: this.voters,
     };
+  }
+
+  toMongoDB(): MongoDefinition {
+    return {
+      _id: this._id,
+      author: this.author,
+      text: this.text,
+      voters: this.voters,
+    };
+  }
+
+  static gqlFields(): string {
+    return `
+      id
+      text
+      author
+      voters
+    `;
   }
 }
 

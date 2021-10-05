@@ -11,6 +11,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  IntDict: any;
+  StringDict: any;
   Upload: any;
 };
 
@@ -26,71 +28,80 @@ export enum CacheControlScope {
 
 export type Definition = {
   __typename?: 'Definition';
-  author_id: Scalars['String'];
+  author: Maybe<Scalars['ID']>;
   id: Scalars['ID'];
-  text: Scalars['String'];
-  voter_ids: Array<Scalars['String']>;
+  text: Maybe<Scalars['String']>;
+  voters: Maybe<Array<Scalars['ID']>>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addPlayer: Maybe<Player>;
-  createSession: Maybe<Session>;
+  createUser: Maybe<User>;
+  makeRoom: Maybe<Room>;
+  updateUser: Maybe<User>;
 };
 
 
-export type MutationAddPlayerArgs = {
-  input: Maybe<PlayerInput>;
-  session_id: Scalars['ID'];
+export type MutationCreateUserArgs = {
+  input: Maybe<UserInput>;
 };
 
 
-export type MutationCreateSessionArgs = {
-  input: Maybe<SessionInput>;
+export type MutationMakeRoomArgs = {
+  tag: Scalars['String'];
 };
 
-export type Player = {
-  __typename?: 'Player';
-  color: Scalars['String'];
+
+export type MutationUpdateUserArgs = {
   id: Scalars['ID'];
-  name: Scalars['String'];
-};
-
-export type PlayerInput = {
-  color: Maybe<Scalars['String']>;
-  name: Maybe<Scalars['String']>;
+  input: UserInput;
 };
 
 export type Query = {
   __typename?: 'Query';
-  getSession: Maybe<Session>;
+  getRoom: Maybe<Room>;
 };
 
 
-export type QueryGetSessionArgs = {
-  id: Scalars['ID'];
-};
-
-export type Session = {
-  __typename?: 'Session';
-  id: Scalars['ID'];
-  players: Array<Player>;
-  tag: Scalars['String'];
-  words: Array<Word>;
-};
-
-export type SessionInput = {
+export type QueryGetRoomArgs = {
+  id: Maybe<Scalars['ID']>;
   tag: Maybe<Scalars['String']>;
+};
+
+export type Room = {
+  __typename?: 'Room';
+  colors: Maybe<Scalars['StringDict']>;
+  id: Scalars['ID'];
+  players: Maybe<Array<Scalars['ID']>>;
+  scores: Maybe<Scalars['IntDict']>;
+  tag: Maybe<Scalars['String']>;
+  words: Maybe<Array<Word>>;
+};
+
+export type RoomInput = {
+  tag: Maybe<Scalars['String']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  color: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  name: Maybe<Scalars['String']>;
+};
+
+export type UserInput = {
+  color: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
 };
 
 export type Word = {
   __typename?: 'Word';
-  author_id: Scalars['String'];
-  comittee_ids: Array<Scalars['String']>;
-  definitions: Array<Definition>;
+  author: Maybe<Scalars['ID']>;
+  comittee: Maybe<Array<Scalars['ID']>>;
+  definitions: Maybe<Array<Definition>>;
   id: Scalars['ID'];
-  status: WordStatus;
-  text: Scalars['String'];
+  status: Maybe<WordStatus>;
+  text: Maybe<Scalars['String']>;
 };
 
 export enum WordStatus {
@@ -171,13 +182,15 @@ export type ResolversTypes = {
   CacheControlScope: CacheControlScope;
   Definition: ResolverTypeWrapper<Definition>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  IntDict: ResolverTypeWrapper<Scalars['IntDict']>;
   Mutation: ResolverTypeWrapper<{}>;
-  Player: ResolverTypeWrapper<Player>;
-  PlayerInput: PlayerInput;
   Query: ResolverTypeWrapper<{}>;
-  Session: ResolverTypeWrapper<Session>;
-  SessionInput: SessionInput;
+  Room: ResolverTypeWrapper<Room>;
+  RoomInput: RoomInput;
+  StringDict: ResolverTypeWrapper<Scalars['StringDict']>;
   Upload: ResolverTypeWrapper<Scalars['Upload']>;
+  User: ResolverTypeWrapper<User>;
+  UserInput: UserInput;
   Word: ResolverTypeWrapper<Word>;
   WordStatus: WordStatus;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
@@ -190,13 +203,15 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   Definition: Definition;
   ID: Scalars['ID'];
+  IntDict: Scalars['IntDict'];
   Mutation: {};
-  Player: Player;
-  PlayerInput: PlayerInput;
   Query: {};
-  Session: Session;
-  SessionInput: SessionInput;
+  Room: Room;
+  RoomInput: RoomInput;
+  StringDict: Scalars['StringDict'];
   Upload: Scalars['Upload'];
+  User: User;
+  UserInput: UserInput;
   Word: Word;
   Boolean: Scalars['Boolean'];
   Int: Scalars['Int'];
@@ -257,58 +272,71 @@ export type CacheControlDirectiveArgs = {
 export type CacheControlDirectiveResolver<Result, Parent, ContextType = any, Args = CacheControlDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type DefinitionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Definition'] = ResolversParentTypes['Definition']> = {
-  author_id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  author: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  text: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  voter_ids: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  voters: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export interface IntDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['IntDict'], any> {
+  name: 'IntDict';
+}
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  addPlayer: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<MutationAddPlayerArgs, 'session_id'>>;
-  createSession: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType, RequireFields<MutationCreateSessionArgs, never>>;
-};
-
-export type PlayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Player'] = ResolversParentTypes['Player']> = {
-  color: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>;
+  makeRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationMakeRoomArgs, 'tag'>>;
+  updateUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  getSession: Resolver<Maybe<ResolversTypes['Session']>, ParentType, ContextType, RequireFields<QueryGetSessionArgs, 'id'>>;
+  getRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomArgs, never>>;
 };
 
-export type SessionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Session'] = ResolversParentTypes['Session']> = {
+export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
+  colors: Resolver<Maybe<ResolversTypes['StringDict']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  players: Resolver<Array<ResolversTypes['Player']>, ParentType, ContextType>;
-  tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;
+  players: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
+  scores: Resolver<Maybe<ResolversTypes['IntDict']>, ParentType, ContextType>;
+  tag: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  words: Resolver<Maybe<Array<ResolversTypes['Word']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
+
+export interface StringDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['StringDict'], any> {
+  name: 'StringDict';
+}
 
 export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Upload'], any> {
   name: 'Upload';
 }
 
-export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
-  author_id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  comittee_ids: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  definitions: Resolver<Array<ResolversTypes['Definition']>, ParentType, ContextType>;
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  color: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  status: Resolver<ResolversTypes['WordStatus'], ParentType, ContextType>;
-  text: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
+  author: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  comittee: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
+  definitions: Resolver<Maybe<Array<ResolversTypes['Definition']>>, ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  status: Resolver<Maybe<ResolversTypes['WordStatus']>, ParentType, ContextType>;
+  text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
   Definition: DefinitionResolvers<ContextType>;
+  IntDict: GraphQLScalarType;
   Mutation: MutationResolvers<ContextType>;
-  Player: PlayerResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
-  Session: SessionResolvers<ContextType>;
+  Room: RoomResolvers<ContextType>;
+  StringDict: GraphQLScalarType;
   Upload: GraphQLScalarType;
+  User: UserResolvers<ContextType>;
   Word: WordResolvers<ContextType>;
 };
 

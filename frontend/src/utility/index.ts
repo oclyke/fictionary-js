@@ -1,15 +1,18 @@
+
 export const preventDefault = (event: React.SyntheticEvent) => event.preventDefault();
 
-export {
-  computeScore,
-  sortPlayers,
-  suggestId,
-} from './interactions';
+export { suggestId } from './id';
+export { gqlop } from './graphql';
 
 export {
-  requestSessionByTag,
-  requestUpdateSession,
-  requestDeleteSession,
-  requestCreateSessionWithTag,
-  onUpdateSessionByID,
+  roomByTag,
+  roomByID,
+  makeRoom,
+  createUser,
+  updateUser,
 } from './db';
+
+export {
+  setLocalUser,
+  getLocalUser,
+} from './local';

@@ -1,20 +1,26 @@
-/*
-// This file is subject to the terms and conditions defined in
-// file 'LICENSE.md', which is part of this source code package.
-*/
-
-// export {
-//   Session as SessionType,
-//   Player as PlayerType,
-//   Word as WordType,
-//   Definition as DefinitionType,
-// } from '../../generated/graphql';
-
-export { default as Session } from './session';
-export { default as Word } from './word';
-export { default as Player } from './player';
-export { default as Definition } from './definition';
+export type StringDict = { [key: string]: string }
+export type IntDict = { [key: string]: number }
 
 export {
-  default as getUUID,
-} from './uuid';
+  default as Room,
+  MongoRoom,
+  GQLRoom,
+} from './room';
+
+export {
+  default as Word,
+  MongoWord,
+  GQLWord,
+} from './word';
+
+export {
+  default as User,
+  MongoUser,
+  GQLUser,
+} from './user';
+
+export {
+  default as Definition,
+  MongoDefinition,
+  GQLDefinition,
+} from './definition';

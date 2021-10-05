@@ -1,0 +1,45 @@
+/* eslint-disable no-underscore-dangle */
+
+import {
+  Room as GQLRoom,
+  User as GQLUser,
+  Word as GQLWord,
+  Definition as GQLDefinition,
+} from '../generated/graphql';
+
+import {
+  MongoUser,
+  MongoRoom,
+  MongoWord,
+  MongoDefinition,
+} from '../db';
+
+export const mongo2gql_definition = (mongo: MongoDefinition): GQLDefinition => ({
+  id: mongo._id,
+  author: mongo.author,
+  text: mongo.text,
+  voters: mongo.voters,
+});
+
+export const mongo2gql_word = (mongo: MongoWord): GQLWord => ({
+  id: mongo._id,
+  author: mongo.author,
+  text: mongo.text,
+  comittee: mongo.comittee,
+  status: mongo.status,
+  definitions: mongo.definitions.map((d) => mongo2gql_definition(d)),
+});
+
+export const mongo2gql_room = (mongo: MongoRoom): GQLRoom => ({
+  id: mongo._id,
+  tag: mongo.tag,
+  scores: mongo.scores,
+  colors: mongo.colors,
+  words: mongo.words.map((w) => mongo2gql_word(w)),
+});
+
+export const mongo2gql_user = (mongo: MongoUser): GQLUser => ({
+  id: mongo._id,
+  name: mongo.name,
+  color: mongo.color,
+});

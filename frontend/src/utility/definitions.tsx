@@ -3,16 +3,16 @@
 // file 'LICENSE.md', which is part of this source code package.
 */
 
-import {
-  DefinitionInput,
-} from './../API';
+// import {
+//   DefinitionInput,
+// } from './../API';
 
-export const null_definition: DefinitionInput = {
-  id: '',
-  author: '',
-  text: '',
-  votes: [],
-};
+// export const null_definition: DefinitionInput = {
+//   id: '',
+//   author: '',
+//   text: '',
+//   votes: [],
+// };
 
 // export const real_definition = (w: WordInput): DefinitionInput => {
 //   if (typeof(w.definition) === 'undefined'){ return score; }

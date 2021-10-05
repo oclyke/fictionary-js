@@ -25,9 +25,8 @@ const Component = () => {
   return <>
     <Router>
       <Switch>
-        <Route path='/fictionary/session' component={Games}/>
+        <Route path='/fictionary/room' component={Games}/>
         <Route path='/fictionary' component={Start}/>
-        {/* <Route path='/fictionary' component={Testcomp}/> */}
       </Switch>
     </Router>
   </>

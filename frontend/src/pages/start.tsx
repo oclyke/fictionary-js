@@ -33,18 +33,15 @@ import {
 } from '../components';
 
 import {
-  requestSessionByTag,
+  roomByTag,
   suggestId,
   preventDefault,
+  gqlop,
 } from '../utility';
 
 import {
   version
 } from '../ver';
-
-import {
-  CreateSessionInput,
-} from '../API';
 
 const useStyles = makeStyles({
   bullet: {
@@ -63,10 +60,9 @@ const Component = (props: any) => {
   const bull = <span className={classes.bullet}>•</span>;
 
   const tagActive = async (session_tag: string) => {
-    const result = await requestSessionByTag(session_tag);
-    const data = ((result as any).data as { sessionByTag: { items: CreateSessionInput[]} });
-    const matches = data.sessionByTag.items;
-    return (matches.length) ? true : false;
+    const room = await roomByTag(session_tag);
+    const exists = (room !== null);
+    return exists;
   }
 
   // an effect that runs on first render
@@ -139,19 +135,19 @@ const Component = (props: any) => {
                   <IconButton color='primary' size='small'>
                     <LoopRoundedIcon />
                   </IconButton>
-                  <span>create a unique identifier for your group session</span>
+                  <span>create a unique identifier for your game</span>
                   <ul style={{listStyle: 'none'}}>
                     <li>
                       <IconButton color='primary' size='small'>
                         <AddCircleOutlineRoundedIcon />
                       </IconButton>
-                      <span>create a new session</span>
+                      <span>create a new game</span>
                     </li>
                     <li>
                       <IconButton color='primary' size='small'>
                         <ArrowForwardRoundedIcon />
                       </IconButton>
-                      <span>join an existing session</span>
+                      <span>join an existing game</span>
                     </li>
                   </ul>
                 </li>
@@ -241,7 +237,7 @@ const Component = (props: any) => {
         </Box>
       </Box>
 
-      {start && <Redirect to={`/fictionary/session/${tag}`}/>}
+      {start && <Redirect to={`/fictionary/room/${tag}`}/>}
     </>
   );
 }

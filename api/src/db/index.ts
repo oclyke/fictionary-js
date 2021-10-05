@@ -6,7 +6,13 @@
 import {
   MongoClient,
   Db,
+  Collection,
 } from 'mongodb';
+
+import {
+  MongoRoom,
+  MongoUser,
+} from '../schema/implementation';
 
 import {
   debug,
@@ -21,7 +27,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 export const database = (): Db => client.db(DBNAME);
 
 export const collections = {
-  sessions: (): unknown => database().collection('sessions'),
+  rooms: (): Collection<MongoRoom> => database().collection('rooms'),
+  users: (): Collection<MongoUser> => database().collection('users'),
 };
 
 export const connectMongo = async (): Promise<void> => {

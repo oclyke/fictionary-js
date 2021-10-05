@@ -1,2 +1,2 @@
-export { usePlayer } from './usePlayer';
-export { useSession } from './useSession';
+export { useUser, equal as playersIdentical } from './useUser';
+export { useRoom } from './useRoom';
