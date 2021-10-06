@@ -11,6 +11,7 @@ export {
   createUser,
   updateUser,
   getUser,
+  joinRoom,
 } from './db';
 
 export {

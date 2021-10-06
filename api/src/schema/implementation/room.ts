@@ -23,19 +23,19 @@ export {
 export type MongoRoom = {
   _id?: ObjectID,
   tag: string | null,
-  players: string[] | null,
-  scores: IntDict | null,
-  colors: StringDict | null,
-  words: MongoWord[] | null,
+  players: string[],
+  scores: IntDict,
+  colors: StringDict,
+  words: MongoWord[],
 }
 
 class Room {
   // bare properties will be persisted in storage
   readonly _id?: ObjectID = undefined;
   tag: string | null = null;
-  players: string[] | null = null;
-  scores: IntDict | null = null; // map of player ids to their scores
-  colors: StringDict | null = null; // map of player ids to their in-game colors
+  players: string[] = [];
+  scores: IntDict = {}; // map of player ids to their scores
+  colors: StringDict = {}; // map of player ids to their in-game colors
   words: Word[] | null = null;
 
   // class methods will not be preserved in storage
@@ -82,7 +82,7 @@ class Room {
       players: this.players,
       scores: this.scores,
       colors: this.colors,
-      words: (this.words !== null) ? this.words.map((w) => w.toGQL()) : null,
+      words: (this.words !== null) ? this.words.map((w) => w.toGQL()) : [],
     };
   }
 
@@ -93,7 +93,7 @@ class Room {
       players: this.players,
       scores: this.scores,
       colors: this.colors,
-      words: (this.words !== null) ? this.words.map((w) => w.toMongoDB()) : null,
+      words: (this.words !== null) ? this.words.map((w) => w.toMongoDB()) : [],
     };
   }
 

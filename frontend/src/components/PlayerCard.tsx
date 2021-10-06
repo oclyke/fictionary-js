@@ -17,11 +17,13 @@ import { SliderPicker } from 'react-color'
 
 import {
   useUser,
+  useRoom,
+  Room,
 } from '../hooks';
 
 type GQLUser = any;
 class User {
-  _id = undefined
+  id = undefined
   constructor(arg?: any, arg2?: any){
   }
   fromGQL(p: Partial<GQLUser>){
@@ -30,35 +32,50 @@ class User {
 }
 
 type PlayerCardProps = {
-  player: User,
+  userid: string,
 }
 
 const PlayerCard = (props: PlayerCardProps) => {
   const [user, updateUser] = useUser();
-  const player = props.player;
+  const [room] = useRoom();
+  const id = props.userid;
 
   const [want_editing, setEditing] = useState<boolean>(false);
   const [idchanged, setIdChanged] = useState<boolean>(false);
   const [newcolor, setNewColor] = useState('#7540bf'); // solve the white color bug by using one of the output colors from the slider chooser as initial state
   const [newid, setNewId] = useState('');
   const confirmEdits = () => {
-    let to = { ...player };
+    let to = { ...user };
     if(idchanged){
       to.name = newid;
     }
-    // props.onPlayerChange(to);
     updateUser(to);
   }
   
-  console.error('todo: get player score from room state');
-  const score = 666;
-  const editable = player._id === user._id;
+  const getScore = (user_id: string, room: Room) => {
+    const score = room.scores[user_id];
+    if(typeof score === 'undefined'){ return 0; }
+    return score;
+  }
+
+  const editable = (id === user.id);
   const editing = editable && want_editing;
+
+  let display = {
+    ...user,
+  };
+  if (id !== user.id) {
+    display.name = 'temporary', // name = relevant_players_from_database[id].name
+    display.color = room.colors[id]; // color = relevant_players_from_database[id].color || room.colors[id]
+  }
+  console.error('todo: add scoring by changing the room.scores dict')
+  console.error('todo: use player ids to get user info (like name and color) to use in the player cards');
+  const score = getScore(id, room); // 
 
   return <>
     <Box p={1}>
       <Paper
-        style={{backgroundColor: player.color}}
+        style={{backgroundColor: display.color}}
         onClick={(e) => {
           setEditing(true);
         }}
@@ -68,7 +85,7 @@ const PlayerCard = (props: PlayerCardProps) => {
           {/* score + id */}
           {(!editing || !editable) && <>
             <Typography style={{paddingLeft: '8px', paddingTop: '4px', paddingBottom: '4px'}}>
-              {`${(((score) ? score : 0) > 0) ? '+' : ''}${score} : `}{player.name}
+              {`${(((score) ? score : 0) > 0) ? '+' : ''}${score} : `}{display.name}
             </Typography> </>}
 
           {/* id edit input */}
@@ -139,7 +156,7 @@ const PlayerCard = (props: PlayerCardProps) => {
             setNewColor(c.hex);
           }}
           onChangeComplete={(c) => {
-            let to = {...player};
+            let to = {...user};
             to.color = c.hex;
             updateUser(to);
           }}

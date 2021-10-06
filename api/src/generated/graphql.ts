@@ -13,7 +13,6 @@ export type Scalars = {
   Float: number;
   IntDict: any;
   StringDict: any;
-  /** The `Upload` scalar type represents a file upload. */
   Upload: any;
 };
 
@@ -32,12 +31,13 @@ export type Definition = {
   author: Maybe<Scalars['ID']>;
   id: Scalars['ID'];
   text: Maybe<Scalars['String']>;
-  voters: Maybe<Array<Scalars['ID']>>;
+  voters: Array<Scalars['ID']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   createUser: Maybe<User>;
+  joinRoom: Maybe<Room>;
   makeRoom: Maybe<Room>;
   updateUser: Maybe<User>;
 };
@@ -45,6 +45,12 @@ export type Mutation = {
 
 export type MutationCreateUserArgs = {
   input: Maybe<UserInput>;
+};
+
+
+export type MutationJoinRoomArgs = {
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
 };
 
 
@@ -77,12 +83,12 @@ export type QueryGetUserArgs = {
 
 export type Room = {
   __typename?: 'Room';
-  colors: Maybe<Scalars['StringDict']>;
+  colors: Scalars['StringDict'];
   id: Scalars['ID'];
-  players: Maybe<Array<Scalars['ID']>>;
-  scores: Maybe<Scalars['IntDict']>;
+  players: Array<Scalars['ID']>;
+  scores: Scalars['IntDict'];
   tag: Maybe<Scalars['String']>;
-  words: Maybe<Array<Word>>;
+  words: Array<Word>;
 };
 
 export type RoomInput = {
@@ -104,8 +110,8 @@ export type UserInput = {
 export type Word = {
   __typename?: 'Word';
   author: Maybe<Scalars['ID']>;
-  comittee: Maybe<Array<Scalars['ID']>>;
-  definitions: Maybe<Array<Definition>>;
+  comittee: Array<Scalars['ID']>;
+  definitions: Array<Definition>;
   id: Scalars['ID'];
   status: Maybe<WordStatus>;
   text: Maybe<Scalars['String']>;
@@ -282,7 +288,7 @@ export type DefinitionResolvers<ContextType = any, ParentType extends ResolversP
   author: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  voters: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
+  voters: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -292,6 +298,7 @@ export interface IntDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>;
+  joinRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationJoinRoomArgs, 'room_id' | 'user_id'>>;
   makeRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationMakeRoomArgs, 'tag'>>;
   updateUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
 };
@@ -302,12 +309,12 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
-  colors: Resolver<Maybe<ResolversTypes['StringDict']>, ParentType, ContextType>;
+  colors: Resolver<ResolversTypes['StringDict'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  players: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
-  scores: Resolver<Maybe<ResolversTypes['IntDict']>, ParentType, ContextType>;
+  players: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  scores: Resolver<ResolversTypes['IntDict'], ParentType, ContextType>;
   tag: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  words: Resolver<Maybe<Array<ResolversTypes['Word']>>, ParentType, ContextType>;
+  words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -328,8 +335,8 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
   author: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  comittee: Resolver<Maybe<Array<ResolversTypes['ID']>>, ParentType, ContextType>;
-  definitions: Resolver<Maybe<Array<ResolversTypes['Definition']>>, ParentType, ContextType>;
+  comittee: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  definitions: Resolver<Array<ResolversTypes['Definition']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   status: Resolver<Maybe<ResolversTypes['WordStatus']>, ParentType, ContextType>;
   text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

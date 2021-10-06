@@ -36,6 +36,10 @@ import {
   useRoom,
 } from '../hooks';
 
+import {
+  joinRoom as requestUserJoinRoom,
+} from '../utility';
+
 type GQLUser = any;
 class User {
   _id = undefined
@@ -72,6 +76,22 @@ const Component = withRouter(({ history }) => {
     joinRoom(_tag);
   }
 
+  // ensure player is in the game
+  useEffect(() => {
+    
+    if ((typeof user.id !== 'undefined') && (typeof room.id !== 'undefined')){
+      console.log('checking users status in game', user.id, room.players)
+      if(!room.players.includes(user.id)) {
+        requestUserJoinRoom(room.id, user.id)
+          .then((r) => {
+            console.log('added player to room', user.id, r);
+          })
+          .catch((e) => { console.error('failed to add player to room', e); })
+      }
+    }
+  }, [user.id, room.id])
+  
+
   const narrowscreen = !useMediaQuery('(min-width:450px)');
 
   let rootroute = useRouteMatch();
@@ -96,12 +116,8 @@ const Component = withRouter(({ history }) => {
   }
 
 
-  // // make an ordered users list
-  // const room_has_users = ((typeof room.users !== 'undefined') && (room.users !== null));
-  // console.log(room_has_users);
-  // const sorted_users = [user, ...((room_has_users) ? [] : room.users.filter(p => !usersIdentical(p, user)).sort((a, b) => b.score - a.score))];
-  // console.log(sorted_users)
-  const sorted_users = [user];
+  // make an ordered users list
+  const sorted_user_ids = [user.id, ...room.players.filter(id => (id !== user.id)).sort((a, b) => room.scores[b] - room.scores[a])];
 
   return <>
     {/* flexbox for header-users-words-suggestions */}
@@ -133,15 +149,10 @@ const Component = withRouter(({ history }) => {
       {/* users */}
       <Box p={1} style={{paddingTop: 0, paddingBottom: 0}}>
         <Grid item container>
-          {sorted_users.map((user_mapped, idx) => {return <React.Fragment key={`user.${idx}.${user_mapped._id}.info`}>
+          {sorted_user_ids.map((id, idx) => {return <React.Fragment key={`user.${idx}.${id}.info`}>
             <Grid item xs={getPlayerItemWidth(room)} >
               <PlayerCard 
-                player={user_mapped}
-                // editable={user_mapped.id === user.id}
-                // onPlayerChange={(to) => {
-                //   // console.log(to);
-                //   updateUser(to);
-                // }}
+                userid={id}
               />
             </Grid> 
           </React.Fragment>})}

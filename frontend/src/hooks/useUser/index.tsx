@@ -43,37 +43,42 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
   const [room] = useRoom();
 
   const updateUser = (p: Partial<User>): void => {
-
+    if (typeof user.id === 'undefined') {
+      throw new Error('cannot modify player without id')
+    }
+    requestUpdateUser(user.id, p)
+      .then((base) => {
+        const updated_user = new User(base.id, base);
+        setUser(updated_user);
+      })
   }
 
   // initialize user
-  if (typeof user.id === 'undefined') {
-    console.log('user does not have id...')
-    const local = getLocalUserId();
-    console.warn(local, typeof local)
-    if ((typeof local === 'undefined') || (local === null)) {
-      console.log('we need to create a user!')
-      const p = {
-        name: suggestId(),
-        color: palette[Math.floor(Math.random() * palette.length - 0.001)],
-      }
-      createUser(new User(undefined, p))
-        .then((base) => {
-          console.log('got new user: ', base)
-          const created_user = new User(base.id, base);
-          setUser(created_user);
-          setLocalUserId(created_user.id);
-        });
-    } else {
-      console.log('local id was: ', local);
-      console.log('retrieve user from database')
-      getUser(local)
-        .then((base) => {
-          const got_user = new User(base.id, base)
-          setUser(got_user);
-        });
+  useEffect(() => {
+    if (typeof user.id === 'undefined') {
+      // const local = getLocalUserId();
+      // if ((typeof local === 'undefined') || (local === null)) {
+        const p = {
+          name: suggestId(),
+          color: palette[Math.floor(Math.random() * palette.length - 0.001)],
+        }
+        createUser(new User(undefined, p))
+          .then((base) => {
+            const created_user = new User(base.id, base);
+            console.log('created user: ', created_user);
+            setUser(created_user);
+            setLocalUserId(created_user.id);
+          });
+      // } else {
+      //   getUser(local)
+      //     .then((base) => {
+      //       const got_user = new User(base.id, base)
+      //       setUser(got_user);
+      //     });
+      // }
     }
-  }
+  }, [user.id])
+
 
   // // allow the user to make modifications to the user
   // const updateUser = async (p: Partial<User>) => {

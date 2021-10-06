@@ -25,6 +25,11 @@ type Mutation {
     id: ID!
     input: UserInput!
   ): User
+
+  joinRoom(
+    room_id: ID!,
+    user_id: ID!,
+  ): Room
 }
 
 type User {
@@ -42,7 +47,7 @@ type Definition {
   id: ID!
   author: ID
   text: String
-  voters: [ID!]
+  voters: [ID!]!
 }
 
 enum WordStatus {
@@ -53,18 +58,18 @@ type Word {
   id: ID!
   text: String
   author: ID
-  comittee: [ID!]
-  definitions: [Definition!]
+  comittee: [ID!]!
+  definitions: [Definition!]!
   status: WordStatus
 }
 
 type Room {
   id: ID!
   tag: String
-  players: [ID!]
-  words: [Word!]
-  scores: IntDict
-  colors: StringDict
+  players: [ID!]!
+  words: [Word!]!
+  scores: IntDict!
+  colors: StringDict!
 }
 
 input RoomInput {

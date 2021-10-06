@@ -27,7 +27,7 @@ export type MongoWord = {
   author: string | null,
   text: string | null,
   definitions: MongoDefinition[] | null,
-  comittee: string[] | null,
+  comittee: string[],
   status: GQLWordStatus | null,
 }
 
@@ -36,7 +36,7 @@ class Word {
   author: string | null = null;
   text: string | null = null;
   definitions: Definition[] | null = null;
-  comittee: string[] | null = null;
+  comittee: string[] = [];
   status: GQLWordStatus | null = GQLWordStatus.None;
 
   // class methods will not be preserved in storage
@@ -82,7 +82,7 @@ class Word {
       text: this.text,
       author: this.author,
       comittee: this.comittee,
-      definitions: (this.definitions !== null) ? this.definitions.map((d) => (d.toGQL())) : null,
+      definitions: (this.definitions !== null) ? this.definitions.map((d) => (d.toGQL())) : [],
       status: this.status,
     };
   }

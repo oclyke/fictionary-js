@@ -20,7 +20,7 @@ export type MongoDefinition = {
   _id: ObjectID,
   author: string | null,
   text: string | null,
-  voters: string[] | null,
+  voters: string[],
 }
 
 class Definition {
@@ -28,7 +28,7 @@ class Definition {
   readonly _id: ObjectID = undefined;
   author: string | null = null;
   text: string | null = null;
-  voters: string[] | null = null;
+  voters: string[] = [];
 
   // class methods will not be preserved in storage
   constructor(id?: string | ObjectID, base?: { mongo?: Partial<MongoDefinition>, gql?: Partial<GQLDefinition> }) {

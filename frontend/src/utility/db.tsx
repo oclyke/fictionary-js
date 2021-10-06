@@ -17,6 +17,7 @@ export const roomByTag = async (tag: string): Promise<Room> => {
   }
   const { data: { getRoom }} = await gqlop(query, variables);
   const base = getRoom;
+  console.log(base);
   return new Room(base.id, base);
 }
 
@@ -61,7 +62,8 @@ export const createUser = async (input: Partial<User>): Promise<User> => {
 }
 
 export const updateUser = async (id: string, input: Partial<User>): Promise<User> => {
-  const query = `mutation ($id: ID!, $input: UserInput){ updateUser(id: $room_id, input: $input){ ${User.gqlFields()} }}`;
+  const query = `mutation ($id: ID!, $input: UserInput!){ updateUser(id: $id, input: $input){ ${User.gqlFields()} }}`;
+  delete input.id;
   const variables = {
     id,
     input,
@@ -69,4 +71,15 @@ export const updateUser = async (id: string, input: Partial<User>): Promise<User
   const { data: { updateUser } } = await gqlop(query, variables);
   const base = updateUser; // note: this probably shadows the function name
   return new User(base.id, base);
+}
+
+export const joinRoom = async (room_id: string, user_id: string): Promise<Room> => {
+  const query = `mutation ($room_id: ID!, $user_id: ID!){ joinRoom(room_id: $room_id, user_id: $user_id){ ${Room.gqlFields()} }}`;
+  const variables = {
+    room_id,
+    user_id,
+  }
+  const { data: { joinRoom } } = await gqlop(query, variables);
+  const base = joinRoom; // note: this probably shadows the function name
+  return new Room(base.id, base);
 }

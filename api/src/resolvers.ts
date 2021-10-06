@@ -22,6 +22,14 @@ import {
   User,
 } from './schema/implementation';
 
+import {
+  notifyRoom,
+} from '.';
+
+import {
+  debug,
+} from './utility';
+
 /*
 // remember: resolver args are: (parent, args, context, info)
 */
@@ -70,7 +78,7 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
         _id: (args.id) ? new ObjectID(args.id) : undefined,
         tag: (args.tag) ? args.tag : undefined,
       });
-      const cursor = await collections.rooms().find(query, {});
+      const cursor = await collections.rooms().find(query, {}); // note: should probably be using collection.findOne() instead...
       if (await cursor.count() !== 1) { return null; }
       const [base] = await cursor.toArray();
       return new Room(base._id, { mongo: base }).toGQL();
@@ -80,7 +88,7 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       const query = {
         _id: new ObjectID(args.id),
       };
-      const cursor = await collections.users().find(query, {});
+      const cursor = await collections.users().find(query, {}); // note: should probably be using collection.findOne() instead...
       if (await cursor.count() !== 1) { return null; }
       const [base] = await cursor.toArray();
       return new User(base._id, { mongo: base }).toGQL();
@@ -97,7 +105,7 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
         tag: args.tag,
       };
       const options = {};
-      const cursor = await collections.rooms().find(query, options);
+      const cursor = await collections.rooms().find(query, options); // note: should probably be using collection.findOne() instead...
       if (await cursor.count() === 1) {
         const [base] = await cursor.toArray();
         return new Room(base._id, { mongo: base }).toGQL();
@@ -137,6 +145,27 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
         throw new Error('failed to update user');
       }
       return new User(value._id, { mongo: value }).toGQL();
+    },
+
+    joinRoom: async (parent, args) => {
+      const filter = {
+        _id: new ObjectID(args.room_id),
+      };
+      const update = {
+        $addToSet: {
+          players: args.user_id,
+        },
+      };
+      const { ok, value } = await collections.rooms().findOneAndUpdate(filter, update, { returnDocument: 'after' });
+      if ((!ok) || (value === null) || (typeof value === 'undefined')) {
+        throw new Error('failed to update room');
+      }
+      try {
+        await notifyRoom(args.room_id);
+      } catch (e) {
+        debug.error('could not notify room: ', e);
+      }
+      return new Room(value._id, { mongo: value }).toGQL();
     },
   },
 };

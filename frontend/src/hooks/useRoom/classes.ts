@@ -73,10 +73,10 @@ export class Word {
 export class Room {
   id?: string = undefined;
   tag: string | null = null;
-  players: string[] | null = null;
-  scores: IntDict | null = null; // map of player ids to their scores
-  colors: StringDict | null = null; // map of player ids to their in-game colors
-  words: Word[] | null = null;
+  players: string[] = [];
+  scores: IntDict = {}; // map of player ids to their scores
+  colors: StringDict = {}; // map of player ids to their in-game colors
+  words: Word[] = [];
 
   constructor(id?: string, base?: Partial<Room>) {
     if (typeof id !== 'undefined') { this.id = id; }
