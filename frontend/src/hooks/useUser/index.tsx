@@ -54,7 +54,7 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
   }
 
   // initialize user
-  useEffect(() => {
+  useEffect(() => {1
     if (typeof user.id === 'undefined') {
       // const local = getLocalUserId();
       // if ((typeof local === 'undefined') || (local === null)) {

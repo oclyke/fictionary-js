@@ -50,6 +50,7 @@ export type MutationCreateUserArgs = {
 
 export type MutationJoinRoomArgs = {
   room_id: Scalars['ID'];
+  user: UserInput;
   user_id: Scalars['ID'];
 };
 
@@ -85,7 +86,7 @@ export type Room = {
   __typename?: 'Room';
   colors: Scalars['StringDict'];
   id: Scalars['ID'];
-  players: Array<Scalars['ID']>;
+  players: Array<User>;
   scores: Scalars['IntDict'];
   tag: Maybe<Scalars['String']>;
   words: Array<Word>;
@@ -298,7 +299,7 @@ export interface IntDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>;
-  joinRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationJoinRoomArgs, 'room_id' | 'user_id'>>;
+  joinRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationJoinRoomArgs, 'room_id' | 'user' | 'user_id'>>;
   makeRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationMakeRoomArgs, 'tag'>>;
   updateUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
 };
@@ -311,7 +312,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
   colors: Resolver<ResolversTypes['StringDict'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  players: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  players: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   scores: Resolver<ResolversTypes['IntDict'], ParentType, ContextType>;
   tag: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;

@@ -151,21 +151,22 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       const filter = {
         _id: new ObjectID(args.room_id),
       };
-      const update = {
-        $addToSet: {
-          players: args.user_id,
-        },
-      };
-      const { ok, value } = await collections.rooms().findOneAndUpdate(filter, update, { returnDocument: 'after' });
-      if ((!ok) || (value === null) || (typeof value === 'undefined')) {
-        throw new Error('failed to update room');
-      }
+      // const update = {
+      //   $addToSet: {
+      //     players: args.user_id,
+      //   },
+      // };
+      // const { ok, value } = await collections.rooms().findOneAndUpdate(filter, update, { returnDocument: 'after' });
+      // if ((!ok) || (value === null) || (typeof value === 'undefined')) {
+      //   throw new Error('failed to update room');
+      // }
       try {
         await notifyRoom(args.room_id);
       } catch (e) {
         debug.error('could not notify room: ', e);
       }
-      return new Room(value._id, { mongo: value }).toGQL();
+      // return new Room(value._id, { mongo: value }).toGQL();
+      return new Room('', { mongo: {} }).toGQL();
     },
   },
 };
