@@ -130,7 +130,7 @@ const interval = setInterval(/* ping */() => {
 
 const server = new ApolloServer({
   typeDefs,
-  // resolvers, // note: just comment out resolvers when running codegen
+  resolvers, // note: just comment out resolvers when running codegen
   context: ({ req }) => {
     const token = req.headers.authorization || '';
     return { token };

@@ -3,6 +3,10 @@ import {
   StringDict,
 } from './dicts';
 
+import {
+  User,
+} from '../useUser/classes'
+
 // these classes are only meant to deal with the GraphQL interface, so they have similar fields
 // todo: generate suitable classes automatically from the api interface code (we mostly have the tech except the bundlers seem to dislike importing from a parent directory)
 
@@ -97,6 +101,9 @@ export class Room {
       id
       tag
       players
+      aliases {
+        ${User.gqlFields()}
+      }
       scores
       colors
       words {

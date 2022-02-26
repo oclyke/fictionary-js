@@ -73,6 +73,7 @@ const Component = withRouter(({ history }) => {
 
   // ensure tag is up to date
   if(room.tag !== _tag){
+    console.log(`joining room ${_tag}`)
     joinRoom(_tag);
   }
 

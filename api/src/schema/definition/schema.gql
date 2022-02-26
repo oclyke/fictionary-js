@@ -27,9 +27,8 @@ type Mutation {
   ): User
 
   joinRoom(
-    room_id: ID!,
+    room_id: ID!
     user_id: ID!
-    user: UserInput!,
   ): Room
 }
 
@@ -67,7 +66,8 @@ type Word {
 type Room {
   id: ID!
   tag: String
-  players: [User!]!
+  players: [ID!]!
+  aliases: [User!]!
   words: [Word!]!
   scores: IntDict!
   colors: StringDict!

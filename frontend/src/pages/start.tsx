@@ -237,7 +237,7 @@ const Component = (props: any) => {
         </Box>
       </Box>
 
-      {start && <Redirect to={`/fictionary/room/${tag}`}/>}
+      {start && <Redirect to={`/fictionary/${tag}`}/>}
     </>
   );
 }

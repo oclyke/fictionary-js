@@ -42,6 +42,8 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
   const [user, setUser] = useState<User>(new User(undefined));
   const [room] = useRoom();
 
+  console.log('initial user', user)
+
   const updateUser = (p: Partial<User>): void => {
     if (typeof user.id === 'undefined') {
       throw new Error('cannot modify player without id')
@@ -56,8 +58,8 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
   // initialize user
   useEffect(() => {1
     if (typeof user.id === 'undefined') {
-      // const local = getLocalUserId();
-      // if ((typeof local === 'undefined') || (local === null)) {
+      const local = getLocalUserId();
+      if ((typeof local === 'undefined') || (local === null)) {
         const p = {
           name: suggestId(),
           color: palette[Math.floor(Math.random() * palette.length - 0.001)],
@@ -69,13 +71,13 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
             setUser(created_user);
             setLocalUserId(created_user.id);
           });
-      // } else {
-      //   getUser(local)
-      //     .then((base) => {
-      //       const got_user = new User(base.id, base)
-      //       setUser(got_user);
-      //     });
-      // }
+      } else {
+        getUser(local)
+          .then((base) => {
+            const got_user = new User(base.id, base)
+            setUser(got_user);
+          });
+      }
     }
   }, [user.id])
 

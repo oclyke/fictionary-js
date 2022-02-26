@@ -10,18 +10,17 @@ import {
   Room,
 } from '../hooks/useRoom';
 
-export const roomByTag = async (tag: string): Promise<Room> => {
+export const roomByTag = async (tag: string): Promise<Room | null> => {
   const query = `query ($tag: String!){ getRoom(tag: $tag){ ${Room.gqlFields()} }}`;
   const variables = {
     tag,
   }
   const { data: { getRoom }} = await gqlop(query, variables);
   const base = getRoom;
-  console.log(base);
-  return new Room(base.id, base);
+  return (base === null) ? null : new Room(base.id, base)
 }
 
-export const roomByID = async (id: string): Promise<Room> => {
+export const roomByID = async (id: string): Promise<Room | null> => {
   const query = `query ($id: ID!){ getRoom(id: $id){ ${Room.gqlFields()} }}`;
   const variables = {
     id,
