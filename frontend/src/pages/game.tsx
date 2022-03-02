@@ -79,14 +79,9 @@ const Component = withRouter(({ history }) => {
 
   // ensure player is in the game
   useEffect(() => {
-    
     if ((typeof user.id !== 'undefined') && (typeof room.id !== 'undefined')){
-      console.log('checking users status in game', user.id, room.players)
       if(!room.players.includes(user.id)) {
         requestUserJoinRoom(room.id, user.id)
-          .then((r) => {
-            console.log('added player to room', user.id, r);
-          })
           .catch((e) => { console.error('failed to add player to room', e); })
       }
     }
@@ -152,7 +147,7 @@ const Component = withRouter(({ history }) => {
         <Grid item container>
           {sorted_user_ids.map((id, idx) => {return <React.Fragment key={`user.${idx}.${id}.info`}>
             <Grid item xs={getPlayerItemWidth(room)} >
-              <PlayerCard 
+              <PlayerCard
                 userid={id}
               />
             </Grid> 

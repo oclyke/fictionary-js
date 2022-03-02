@@ -16,20 +16,16 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { SliderPicker } from 'react-color'
 
 import {
+  Dict,
+} from '../utility/dicts';
+
+import {
   useUser,
   useRoom,
+  usePlayersInfo,
   Room,
+  User,
 } from '../hooks';
-
-type GQLUser = any;
-class User {
-  id = undefined
-  constructor(arg?: any, arg2?: any){
-  }
-  fromGQL(p: Partial<GQLUser>){
-    return this;
-  }
-}
 
 type PlayerCardProps = {
   userid: string,
@@ -39,6 +35,7 @@ const PlayerCard = (props: PlayerCardProps) => {
   const [user, updateUser] = useUser();
   const [room] = useRoom();
   const id = props.userid;
+  const [players] = usePlayersInfo();
 
   const [want_editing, setEditing] = useState<boolean>(false);
   const [idchanged, setIdChanged] = useState<boolean>(false);
@@ -53,6 +50,7 @@ const PlayerCard = (props: PlayerCardProps) => {
   }
   
   const getScore = (user_id: string, room: Room) => {
+    console.error('todo: add scoring by changing the room.scores dict')
     const score = room.scores[user_id];
     if(typeof score === 'undefined'){ return 0; }
     return score;
@@ -61,16 +59,22 @@ const PlayerCard = (props: PlayerCardProps) => {
   const editable = (id === user.id);
   const editing = editable && want_editing;
 
+
   let display = {
     ...user,
   };
   if (id !== user.id) {
-    display.name = 'temporary', // name = relevant_players_from_database[id].name
-    display.color = room.colors[id]; // color = relevant_players_from_database[id].color || room.colors[id]
+    try {
+    const cached = players[id];
+    display.name = cached.name;
+    display.color = cached.color;
+    } catch {
+      display.name = 'unknown';
+      display.color = '#ffffff';
+    }
   }
-  console.error('todo: add scoring by changing the room.scores dict')
-  console.error('todo: use player ids to get user info (like name and color) to use in the player cards');
-  const score = getScore(id, room); // 
+
+  const score = getScore(id, room);
 
   return <>
     <Box p={1}>

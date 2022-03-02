@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react';
 
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
-
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
-// import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
@@ -22,6 +20,25 @@ import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 import CheckRoundedIcon from '@material-ui/icons/CheckRounded';
 import SettingsIcon from '@material-ui/icons/Settings';
+
+import {
+  Dict,
+} from '../utility/dicts';
+
+import {
+  User,
+  Word,
+  Definition,
+  useUser,
+  usePlayersInfo,
+} from '../hooks';
+
+import {
+  userCanSee,
+  userCanVote,
+  userHasVoted,
+  maxVotes,
+} from '../utility/interactions';
 
 // import {
 //   CreateSessionInput,
@@ -48,7 +65,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 
 // import { v4 as uuidv4 } from 'uuid';
 
-const shuffle = (array: any[]) => {
+function shuffle<T>(array: T[]): T[] {
   var m = array.length, t, i;
 
   // While there remain elements to shuffle…
@@ -95,51 +112,51 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 })
 );
 
-type VotesIndicatorProps = {
-  // session: CreateSessionInput,
-  // word: WordInput,
-  // def: DefinitionInput,
-}
+// type VotesIndicatorProps = {
+//   // session: CreateSessionInput,
+//   // word: WordInput,
+//   // def: DefinitionInput,
+// }
 
-const VotesIndicator = (props: VotesIndicatorProps) => {
-  // const session = props.session;
-  // const maxvotes = getMaxVotes(props.word);
-  // const def = props.def;
+// const VotesIndicator = (props: VotesIndicatorProps) => {
+//   // const session = props.session;
+//   // const maxvotes = getMaxVotes(props.word);
+//   // const def = props.def;
 
-  // let spaces = maxvotes;
-  // let voters: PlayerInput[] = [];
-  // if(def.votes){
-  //   spaces -= def.votes.length;
-  //   voters = def.votes.map(id => {
-  //     const matches = session.players?.filter(p => (p.id === id));
-  //     if(matches && matches.length){
-  //       return matches[0]
-  //     }
-  //     return {
-  //       id,
-  //       name: '',
-  //       color: '#000000',
-  //     }
-  //   });
-  // }
-  const spaces = 3;
-  const voters: any[] = [];
+//   // let spaces = maxvotes;
+//   // let voters: PlayerInput[] = [];
+//   // if(def.votes){
+//   //   spaces -= def.votes.length;
+//   //   voters = def.votes.map(id => {
+//   //     const matches = session.players?.filter(p => (p.id === id));
+//   //     if(matches && matches.length){
+//   //       return matches[0]
+//   //     }
+//   //     return {
+//   //       id,
+//   //       name: '',
+//   //       color: '#000000',
+//   //     }
+//   //   });
+//   // }
+//   const spaces = 3;
+//   const voters: any[] = [];
   
-  return <>
-    {[...([...Array(spaces)].map(_ => '#ffffff')), ...(voters.map(voter => voter.color))].map(color => {
-      return <>
-        <span 
-          style={{
-            display: 'inline-block',
-            backgroundColor: color,
-            height: '12px',
-            width: '12px',
-          }}
-        /> 
-      </>
-    })}
-  </>
-}
+//   return <>
+//     {[...([...Array(spaces)].map(_ => '#ffffff')), ...(voters.map(voter => voter.color))].map(color => {
+//       return <>
+//         <span 
+//           style={{
+//             display: 'inline-block',
+//             backgroundColor: color,
+//             height: '12px',
+//             width: '12px',
+//           }}
+//         /> 
+//       </>
+//     })}
+//   </>
+// }
 
 // const null_definition: DefinitionInput = {
 //   id: '',
@@ -148,9 +165,9 @@ const VotesIndicator = (props: VotesIndicatorProps) => {
 //   votes: [],
 // }
 
-type WordCardProps = {
-  // word: WordInput,
-}
+// type WordCardProps = {
+//   word: Word,
+// }
 
 // const WordCard = (props: WordCardProps) => {
 //   // const [session_ref] = useSession();
@@ -457,11 +474,128 @@ type WordCardProps = {
 
 // export default WordCard;
 
-const WordCard = () => {
+
+
+type VotesIndicatorProps = {
+  // session: CreateSessionInput,
+  word: Word,
+  def: Definition,
+  players: Dict<User>,
+}
+
+const VotesIndicator = (props: VotesIndicatorProps) => {
+  const maxvotes = maxVotes(props.word);
+  const def = props.def;
+  const players = props.players;
+
+  let spaces = maxvotes;
+  let voters = def.voters;
+
+  const getUserColor = (user_id: string): string => {
+    const cached = players[user_id];
+    if (typeof cached === 'undefined'){
+      return '#888888'
+    }
+    return cached.color;
+  }
+  
   return <>
-    <div>
-      word card stand in
-    </div>
+    {[...([...Array(spaces)].map(_ => '#ffffff')), ...(voters.map(voter => getUserColor(voter)))].map(color => {
+      return <>
+        <span 
+          style={{
+            display: 'inline-block',
+            backgroundColor: color,
+            height: '12px',
+            width: '12px',
+          }}
+        /> 
+      </>
+    })}
+  </>
+}
+
+type WordCardProps = {
+  word: Word,
+}
+
+const WordCard = (props: WordCardProps) => {
+  const [user] = useUser();
+  const classes = useStyles();
+  const word = props.word;
+
+  // definitions
+  //    posing: the one a player writes, 
+  //    shuffled: an array of all definitions shuffled once, 
+  //    selected: the id of the selected definition
+  //    filtered: a list of definitions that the user can currently see
+  const [posing, setPosing] = useState<string>('');
+  const [shuffled, setShuffled] = useState<Definition[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const filtered = shuffled.filter(def => userCanSee(def, word, user))
+
+  const closed = (word.status === 'closed')
+  const defined = (word.status === 'defined')
+  const voted = (word.status === 'voted')
+
+  const [players] = usePlayersInfo();
+
+  useEffect(() => {
+    console.warn('word status changed', word.status)
+
+    setShuffled(shuffle(word.definitions)); // set the shuffled definitions once (to not annoy the user with constantly changing order)
+    
+  }, [word.status])
+  
+  return <>
+    <Box m={1} >
+      <Card className={classes.root}>
+      <CardContent>
+
+        {/* word info */}
+        <Box display='flex' flexDirection='row' alignItems='center' justifyContent='space-between'>
+
+          {/* word */}
+          <Typography variant='h6' component='h2'>
+            {word.text}
+          </Typography>
+
+          {/* definitions */}
+          
+          {filtered.map((def, idx) => {
+            const correct = (def.author === word.author);
+            const author_color = players[def.author].color;
+
+            return <>
+              <Box fontWeight={(!correct || !closed) ? 'fontWeightLight' : 'fontWeightBold'} key={`words.${idx}.${word.id}.defs.${def.id}`}>
+              
+                {/* display votes at the end */}
+                {(closed) && <VotesIndicator players={players} word={word} def={def} />}
+
+                {/* radio buttons for voting */}
+                {(!closed) && userCanVote(word, user) && 
+                <Radio
+                  style={{color: author_color}}
+                  checked={(selected === null) ? false : (selected === def.id)}
+                  onChange={(e) => {
+                    setSelected(prev => ((prev === null) ? def.id : null));
+                  }}
+                  inputProps={{ 'aria-label': `definition ${idx}: ${def.text}` }}
+                />}
+                {def.text}
+              </Box>
+            </>})}
+
+        </Box>
+
+
+
+      </CardContent>
+      <CardActions>
+        actions standin
+      </CardActions>
+      </Card>
+    </Box>
   </>
 }
 

@@ -1,11 +1,12 @@
 import {
   IntDict,
   StringDict,
+  Dict,
 } from './dicts';
 
 import {
   User,
-} from '../useUser/classes'
+} from '..'
 
 // these classes are only meant to deal with the GraphQL interface, so they have similar fields
 // todo: generate suitable classes automatically from the api interface code (we mostly have the tech except the bundlers seem to dislike importing from a parent directory)
@@ -78,8 +79,8 @@ export class Room {
   id?: string = undefined;
   tag: string | null = null;
   players: string[] = [];
+  aliases: Dict<User> = {} // cache of players colors and such
   scores: IntDict = {}; // map of player ids to their scores
-  colors: StringDict = {}; // map of player ids to their in-game colors
   words: Word[] = [];
 
   constructor(id?: string, base?: Partial<Room>) {
@@ -90,8 +91,8 @@ export class Room {
   fromBase(base: Partial<Room>): Room {
     if (typeof base.tag !== 'undefined') { this.tag = base.tag; }
     if (typeof base.players !== 'undefined') { this.players = base.players; }
+    if (typeof base.aliases !== 'undefined') { this.aliases = base.aliases; }
     if (typeof base.scores !== 'undefined') { this.scores = base.scores; }
-    if (typeof base.colors !== 'undefined') { this.colors = base.colors; }
     if (typeof base.words !== 'undefined') { this.words = (base.words !== null) ? base.words.map((w) => new Word(w.id, w)) : null; }
     return this;
   }
@@ -101,11 +102,8 @@ export class Room {
       id
       tag
       players
-      aliases {
-        ${User.gqlFields()}
-      }
+      aliases
       scores
-      colors
       words {
         ${Word.gqlFields()}
       }

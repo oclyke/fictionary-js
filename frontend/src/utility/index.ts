@@ -12,6 +12,7 @@ export {
   updateUser,
   getUser,
   joinRoom,
+  proposeWord,
 } from './db';
 
 export {

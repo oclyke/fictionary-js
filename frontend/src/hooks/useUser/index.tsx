@@ -42,8 +42,6 @@ const useUserCore = (): [User, (p: Partial<User>) => void] => {
   const [user, setUser] = useState<User>(new User(undefined));
   const [room] = useRoom();
 
-  console.log('initial user', user)
-
   const updateUser = (p: Partial<User>): void => {
     if (typeof user.id === 'undefined') {
       throw new Error('cannot modify player without id')

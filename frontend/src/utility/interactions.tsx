@@ -3,6 +3,12 @@
 // file 'LICENSE.md', which is part of this source code package.
 */
 
+import {
+  Definition,
+  Word,
+  User,
+} from '../hooks'
+
 // import {
 //   PlayerInput,
 //   CreateSessionInput,
@@ -75,3 +81,50 @@ export const sortPlayers = (session: any, player: any): (any[] | null) => {
 
 
 
+
+export const userHasVoted = (word: Word, user: User) => {
+  if (typeof user.id === 'undefined') {
+    throw new Error('user id should not be undefined!')
+  }
+  let result = false;
+  word.definitions.forEach(def => {
+    if (def.voters.includes(user.id)) {
+      result = true;
+    }
+  })
+  return result;
+}
+
+export const userCanVote = (word: Word, user: User) => {
+  return !userHasVoted(word, user);
+}
+
+export const userCanSee = (def: Definition, word: Word, user: User): boolean => {
+  if (word.status === 'closed') {
+    return true;
+  }
+  if (userHasVoted(word, user)) {
+    return true;
+  }
+  if (word.author === user.id) {
+    return true;
+  }
+  if (def.author === user.id) {
+    return true;
+  }
+
+  return false;
+}
+
+export const maxVotes = (word: Word): number => {
+  let max: number = 0;
+
+  word.definitions.forEach(def => {
+    const voters = def.voters.length;
+    if(voters > max){
+      max = voters
+    }
+  })
+
+  return max;
+}

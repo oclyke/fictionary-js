@@ -18,9 +18,16 @@ import {
 } from './db';
 
 import {
+  Definition,
+  MongoUser,
   Room,
   User,
+  Word,
 } from './schema/implementation';
+
+import {
+  Dict,
+} from './utility/dicts';
 
 import {
   notifyRoom,
@@ -74,6 +81,7 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
     getRoom: async (parent, args) => {
       // either returns the session with the requested tag or null
 
+      // get the room
       const query = prune({
         _id: (args.id) ? new ObjectID(args.id) : undefined,
         tag: (args.tag) ? args.tag : undefined,
@@ -81,7 +89,35 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       const cursor = await collections.rooms().find(query, {}); // note: should probably be using collection.findOne() instead...
       if (await cursor.count() !== 1) { return null; }
       const [base] = await cursor.toArray();
-      return new Room(base._id, { mongo: base }).toGQL();
+
+      // cache player info
+      // get all the users who are in the room...
+      const players_query = {
+        _id: {$in: base.players.map(id => new ObjectID(id))}
+      };
+      const players_cursor = await collections.users().find(players_query, {});
+      const players = await players_cursor.toArray();
+
+      // create new fields (we will be caching all the users that exist - this will either create or update)
+      const room = new Room(base._id, { mongo: base });
+      players.forEach((player) => {
+        const key = player._id.toString();
+        room.aliases[key] = new User(player._id, {mongo: player});
+      });
+
+      // create the operation to update the room with cached info
+      const room_filter = {
+        _id: new ObjectID(base._id),
+      };
+      const room_update = {
+        $set: room.toMongoDB()
+      };
+      const { ok, value } = await collections.rooms().findOneAndUpdate(room_filter, room_update, { returnDocument: 'after' });
+      if ((!ok) || (value === null) || (typeof value === 'undefined')) {
+        throw new Error('failed to update room');
+      }
+
+      return room.toGQL(); // ideally we would return the value that came back from the database here
     },
 
     getUser: async (parent, args) => {
@@ -144,6 +180,7 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       if ((!ok) || (value === null) || (typeof value === 'undefined')) {
         throw new Error('failed to update user');
       }
+      // todo: currently rooms are not notified when users are updated.... this would be nice. Maybe room id that the user is in could be added as an argument?
       return new User(value._id, { mongo: value }).toGQL();
     },
 
@@ -167,6 +204,33 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       }
       return new Room(value._id, { mongo: value }).toGQL();
     },
+
+    proposeWord: async (parent, args) => {
+      // note: we are manually creating ObjectIDs for the definition and word because mongodb won't automatically create them for sub-documents. this *shouldnt* cause any collisions but it would be good to keep in mind
+      const definition = new Definition(new ObjectID(), {gql: {text: args.definition, author: args.user_id}})
+      const word = new Word(new ObjectID(), {gql: {author: args.user_id, text: args.word, definitions: [definition.toGQL()]}})
+
+      const filter = {
+        _id: new ObjectID(args.room_id),
+      };
+      const update = {
+        $addToSet: {
+          words: word.toMongoDB(),
+        },
+      };
+
+      const { ok, value } = await collections.rooms().findOneAndUpdate(filter, update, { returnDocument: 'after' });
+      if ((!ok) || (value === null) || (typeof value === 'undefined')) {
+        throw new Error('failed to update room');
+      }
+      try {
+        await notifyRoom(args.room_id);
+      } catch (e) {
+        debug.error('could not notify room: ', e);
+      }
+
+      return word.toGQL()
+    }
   },
 };
 

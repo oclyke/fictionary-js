@@ -1,6 +1,8 @@
 const PLAYERID_KEY = 'playerid';
 
 export const getLocalUserId = () => {
+  return undefined
+  // temporary! allow other users to join up
   return localStorage.getItem(PLAYERID_KEY);
 }
 

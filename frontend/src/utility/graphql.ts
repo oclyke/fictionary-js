@@ -16,7 +16,7 @@ export const gqlop = async (query: string, variables?: any) => {
   const data = await r.json();
   if (data.errors) {
     // console.error(data.errors);
-    throw new Error(data.errors.map(e => e.message));
+    throw new Error(data.errors.map(e => `error from graphql resolver: ${e.message}`));
   }
   return data;
 }

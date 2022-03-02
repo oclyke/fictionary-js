@@ -14,6 +14,7 @@ export type Scalars = {
   IntDict: any;
   StringDict: any;
   Upload: any;
+  UserDict: any;
 };
 
 export type AdditionalEntityFields = {
@@ -39,6 +40,7 @@ export type Mutation = {
   createUser: Maybe<User>;
   joinRoom: Maybe<Room>;
   makeRoom: Maybe<Room>;
+  proposeWord: Maybe<Word>;
   updateUser: Maybe<User>;
 };
 
@@ -56,6 +58,14 @@ export type MutationJoinRoomArgs = {
 
 export type MutationMakeRoomArgs = {
   tag: Scalars['String'];
+};
+
+
+export type MutationProposeWordArgs = {
+  definition: Scalars['String'];
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
+  word: Scalars['String'];
 };
 
 
@@ -83,8 +93,7 @@ export type QueryGetUserArgs = {
 
 export type Room = {
   __typename?: 'Room';
-  aliases: Array<User>;
-  colors: Scalars['StringDict'];
+  aliases: Scalars['UserDict'];
   id: Scalars['ID'];
   players: Array<Scalars['ID']>;
   scores: Scalars['IntDict'];
@@ -204,6 +213,7 @@ export type ResolversTypes = {
   StringDict: ResolverTypeWrapper<Scalars['StringDict']>;
   Upload: ResolverTypeWrapper<Scalars['Upload']>;
   User: ResolverTypeWrapper<User>;
+  UserDict: ResolverTypeWrapper<Scalars['UserDict']>;
   UserInput: UserInput;
   Word: ResolverTypeWrapper<Word>;
   WordStatus: WordStatus;
@@ -225,6 +235,7 @@ export type ResolversParentTypes = {
   StringDict: Scalars['StringDict'];
   Upload: Scalars['Upload'];
   User: User;
+  UserDict: Scalars['UserDict'];
   UserInput: UserInput;
   Word: Word;
   Boolean: Scalars['Boolean'];
@@ -301,6 +312,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>;
   joinRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationJoinRoomArgs, 'room_id' | 'user_id'>>;
   makeRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationMakeRoomArgs, 'tag'>>;
+  proposeWord: Resolver<Maybe<ResolversTypes['Word']>, ParentType, ContextType, RequireFields<MutationProposeWordArgs, 'definition' | 'room_id' | 'user_id' | 'word'>>;
   updateUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
 };
 
@@ -310,8 +322,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
-  aliases: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-  colors: Resolver<ResolversTypes['StringDict'], ParentType, ContextType>;
+  aliases: Resolver<ResolversTypes['UserDict'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   players: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   scores: Resolver<ResolversTypes['IntDict'], ParentType, ContextType>;
@@ -335,6 +346,10 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export interface UserDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['UserDict'], any> {
+  name: 'UserDict';
+}
+
 export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
   author: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   comittee: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
@@ -354,6 +369,7 @@ export type Resolvers<ContextType = any> = {
   StringDict: GraphQLScalarType;
   Upload: GraphQLScalarType;
   User: UserResolvers<ContextType>;
+  UserDict: GraphQLScalarType;
   Word: WordResolvers<ContextType>;
 };
 

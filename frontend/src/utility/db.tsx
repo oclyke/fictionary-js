@@ -10,6 +10,10 @@ import {
   Room,
 } from '../hooks/useRoom';
 
+import {
+  Word,
+} from '../hooks';
+
 export const roomByTag = async (tag: string): Promise<Room | null> => {
   const query = `query ($tag: String!){ getRoom(tag: $tag){ ${Room.gqlFields()} }}`;
   const variables = {
@@ -81,4 +85,19 @@ export const joinRoom = async (room_id: string, user_id: string): Promise<Room> 
   const { data: { joinRoom } } = await gqlop(query, variables);
   const base = joinRoom; // note: this probably shadows the function name
   return new Room(base.id, base);
+}
+
+export const proposeWord = async (room_id: string, user_id: string, word: string, definition: string): Promise<Word> => {
+  const query = `mutation ($room_id: ID!, $user_id: ID!, $word: String!, $definition: String!){ proposeWord(room_id: $room_id, user_id: $user_id, word: $word, definition: $definition){ ${Word.gqlFields()} }}`;
+  const variables = {
+    room_id,
+    user_id,
+    word,
+    definition,
+  }
+
+  const { data: { proposeWord } } = await gqlop(query, variables);
+  const base = proposeWord; // note: this probably shadows the function name
+
+  return new Word(base.id, base); 
 }

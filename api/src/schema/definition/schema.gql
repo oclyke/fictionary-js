@@ -1,5 +1,6 @@
 scalar IntDict
 scalar StringDict
+scalar UserDict
 
 type Query {
   getRoom(
@@ -30,6 +31,13 @@ type Mutation {
     room_id: ID!
     user_id: ID!
   ): Room
+
+  proposeWord(
+    room_id: ID!
+    user_id: ID!
+    word: String!
+    definition: String!
+  ): Word
 }
 
 type User {
@@ -67,10 +75,9 @@ type Room {
   id: ID!
   tag: String
   players: [ID!]!
-  aliases: [User!]!
+  aliases: UserDict!
   words: [Word!]!
   scores: IntDict!
-  colors: StringDict!
 }
 
 input RoomInput {

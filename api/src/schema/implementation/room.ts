@@ -12,11 +12,16 @@ import {
   StringDict,
   MongoUser,
   MongoWord,
+  GQLUser,
 } from '.';
 
 import {
   Room as GQLRoom,
 } from '../../generated/graphql';
+
+import {
+  Dict,
+} from '../../utility/dicts';
 
 export {
   Room as GQLRoom,
@@ -26,8 +31,8 @@ export type MongoRoom = {
   _id?: ObjectID,
   tag: string | null,
   players: ObjectID[],
+  aliases: Dict<MongoUser>,
   scores: IntDict,
-  colors: StringDict,
   words: MongoWord[],
 }
 
@@ -36,9 +41,8 @@ class Room {
   readonly _id?: ObjectID = undefined;
   tag: string | null = null;
   players: string[] = [];
-  aliases: User[] = [];
+  aliases: Dict<User> = {};
   scores: IntDict = {}; // map of player ids to their scores
-  colors: StringDict = {}; // map of player ids to their in-game colors
   words: Word[] | null = null;
 
   // class methods will not be preserved in storage
@@ -63,8 +67,8 @@ class Room {
   fromGQL(gql: Partial<GQLRoom>): Room {
     if (typeof gql.tag !== 'undefined') { this.tag = gql.tag; }
     if (typeof gql.players !== 'undefined') { this.players = gql.players }
+    if (typeof gql.aliases !== 'undefined') { this.aliases = {}; for (const id in gql.aliases) {this.aliases[id] = new User(id, {gql: gql.aliases[id]})}; }
     if (typeof gql.scores !== 'undefined') { this.scores = gql.scores; }
-    if (typeof gql.colors !== 'undefined') { this.colors = gql.colors; }
     if (typeof gql.words !== 'undefined') { this.words = (gql.words !== null) ? gql.words.map((w) => new Word(w.id).fromGQL(w)) : null; }
     return this;
   }
@@ -72,31 +76,38 @@ class Room {
   fromMongoDB(mongo: Partial<MongoRoom>): Room {
     if (typeof mongo.tag !== 'undefined') { this.tag = mongo.tag; }
     if (typeof mongo.players !== 'undefined') { this.players = mongo.players; }
+    if (typeof mongo.aliases !== 'undefined') { this.aliases = {}; for (const id in mongo.aliases) { this.aliases[id] = new User(id, {mongo: mongo.aliases[id]}); } }
     if (typeof mongo.scores !== 'undefined') { this.scores = mongo.scores; }
-    if (typeof mongo.colors !== 'undefined') { this.colors = mongo.colors; }
     if (typeof mongo.words !== 'undefined') { this.words = (mongo.words !== null) ? mongo.words.map((w) => new Word(w._id).fromMongoDB(w)) : null; }
     return this;
   }
 
   toGQL(): GQLRoom {
+    const aliases: Dict<GQLUser> = {};
+    for (const id in this.aliases) {
+      aliases[id] = this.aliases[id].toGQL();
+    }
     return {
       id: this._id.toHexString(),
       tag: this.tag,
       players: this.players,
-      aliases: this.aliases.map(a => a.toGQL()),
+      aliases,
       scores: this.scores,
-      colors: this.colors,
       words: (this.words !== null) ? this.words.map((w) => w.toGQL()) : [],
     };
   }
 
   toMongoDB(): MongoRoom {
+    const aliases: Dict<MongoUser> = {};
+    for (const id in this.aliases) {
+      aliases[id] = this.aliases[id].toMongoDB()
+    }
     return {
       _id: this._id,
       tag: this.tag,
       players: this.players,
+      aliases,
       scores: this.scores,
-      colors: this.colors,
       words: (this.words !== null) ? this.words.map((w) => w.toMongoDB()) : [],
     };
   }
