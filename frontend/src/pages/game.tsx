@@ -160,7 +160,9 @@ const Component = withRouter(({ history }) => {
       <Box flexGrow={1} style={{overflow: 'auto'}}>
         <Sluicebox>
           <Box display='flex' flexDirection='column'>
-            {room.words && room.words.map((word, idx) => { return <>
+            {room.words && room.words.map((word, idx) => {
+              console.log('author: ', word.author)
+              return <>
               <Box key={`words.${idx}.${word.id}`} style={{alignSelf: `flex-${(word.author === user.id) ? 'end' : 'start'}`}}>
                 <WordCard word={word} />
               </Box> 

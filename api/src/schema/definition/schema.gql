@@ -38,6 +38,20 @@ type Mutation {
     word: String!
     definition: String!
   ): Word
+
+  proposeDefinition(
+    room_id: ID!
+    user_id: ID!
+    word_id: ID!
+    definition: String!
+  ): Definition
+
+  submitVote(
+    room_id: ID!
+    user_id: ID!
+    word_id: ID!
+    def_id: ID!
+  ): Definition
 }
 
 type User {
@@ -59,7 +73,9 @@ type Definition {
 }
 
 enum WordStatus {
-  NONE
+  PROPOSING
+  VOTING
+  CLOSED
 }
 
 type Word {
@@ -68,7 +84,7 @@ type Word {
   author: ID
   comittee: [ID!]!
   definitions: [Definition!]!
-  status: WordStatus
+  status: WordStatus!
 }
 
 type Room {

@@ -230,6 +230,60 @@ const resolvers: {Query: QueryResolvers, Mutation: MutationResolvers} = {
       }
 
       return word.toGQL()
+    },
+    proposeDefinition: async (parent, args) => {
+      const room_id = new ObjectID(args.room_id);
+      const word_id = new ObjectID(args.word_id);
+      const room = await collections.rooms().findOne({_id: room_id});
+      if(room === null){ throw new Error('could not find room'); }
+
+      const word = room.words.filter((w) => w._id.toString() === args.word_id)[0]
+      word.definitions?.forEach((def) => {
+        console.log(def.author, args.user_id)
+        if(def.author?.toString() === args.user_id){
+          throw new Error('user already proposed a definition on this word!')
+        }
+      });
+      
+      const definition = new Definition(new ObjectID())
+      definition.author = args.user_id;
+      definition.text = args.definition;
+
+      const { ok, value } = await collections.rooms().findOneAndUpdate({_id: room_id, 'words._id': word_id}, {$push: {'words.$.definitions': definition.toMongoDB()}}, {returnDocument: 'after'});
+      if ((!ok) || (value === null) || (typeof value === 'undefined')) {
+        throw new Error('failed to update room');
+      }
+      try {
+        await notifyRoom(args.room_id);
+      } catch (e) {
+        debug.error('could not notify room: ', e);
+      }
+
+      return definition.toGQL();
+    },
+    submitVote: async (parent, args) => {
+      // const room = await collections.rooms().findOne({_id: new ObjectID(args.room_id)});
+      // if(room === null){ throw new Error('could not find room'); }
+
+      // const word = room.words.filter((w) => w._id.toString() === args.word_id)[0]
+
+      // word.definitions?.forEach((def) => {
+      //   if(def.voters.includes(args.user_id)){
+      //     throw new Error('user already voted on this word')
+      //   }
+      // });
+
+      // const definition = word.definitions?.filter((d) => d._id.toString() === args.def_id)[0];
+      // definition?.voters.push(args.user_id)
+
+      // // todo: this is actually effed b/c how am I supposed to shove this data back into the game state?
+      // // i'd need to like pop and push the word back into the room after having already done the same to the definition within the word...
+      // // gross.
+      // // rethink how game state is stored!
+
+      // return new Definition(definition._id, {mongo: room}).toGQL();
+
+      return new Definition(new ObjectID()).toGQL();
     }
   },
 };

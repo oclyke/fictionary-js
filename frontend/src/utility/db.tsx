@@ -11,6 +11,7 @@ import {
 } from '../hooks/useRoom';
 
 import {
+  Definition,
   Word,
 } from '../hooks';
 
@@ -100,4 +101,36 @@ export const proposeWord = async (room_id: string, user_id: string, word: string
   const base = proposeWord; // note: this probably shadows the function name
 
   return new Word(base.id, base); 
+}
+
+export const proposeDefinition = async (room_id: string, user_id: string, word_id: string, definition: string): Promise<Room> => {
+  const query = `mutation ($room_id: ID!, $user_id: ID!, $word_id: ID!, $definition: String!){ proposeDefinition(room_id: $room_id, user_id: $user_id, word_id: $word_id, definition: $definition){ ${Definition.gqlFields()} }}`;
+  const variables = {
+    room_id,
+    user_id,
+    word_id,
+    definition,
+  }
+
+  const result = await gqlop(query, variables);
+  console.warn(result)
+  const { data: { proposeDefinition } } = result;
+  const base = proposeDefinition; // note: this probably shadows the function name
+
+  return new Room(base.id, base); 
+}
+
+export const submitVote = async (room_id: string, user_id: string, word_id: string, def_id: string): Promise<Room> => {
+  const query = `mutation ($room_id: ID!, $user_id: ID!, $word_id: ID!, $def_id: ID!){ submitVote(room_id: $room_id, user_id: $user_id, word_id: $word_id, def_id: $def_id){ ${Definition.gqlFields()} }}`;
+  const variables = {
+    room_id,
+    user_id,
+    word_id,
+    def_id,
+  }
+
+  const { data: { submitVote } } = await gqlop(query, variables);
+  const base = submitVote; // note: this probably shadows the function name
+
+  return new Room(base.id, base); 
 }

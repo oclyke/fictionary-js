@@ -16,6 +16,7 @@ import {
 import {
   Word as GQLWord,
   WordStatus as GQLWordStatus,
+  WordStatus,
 } from '../../generated/graphql';
 
 export {
@@ -28,7 +29,7 @@ export type MongoWord = {
   text: string | null,
   definitions: MongoDefinition[] | null,
   comittee: string[],
-  status: GQLWordStatus | null,
+  status: string,
 }
 
 class Word {
@@ -37,7 +38,7 @@ class Word {
   text: string | null = null;
   definitions: Definition[] | null = null;
   comittee: string[] = [];
-  status: GQLWordStatus | null = GQLWordStatus.None;
+  status: GQLWordStatus = GQLWordStatus.Proposing;
 
   // class methods will not be preserved in storage
   constructor(id?: string | ObjectID, base?: {mongo?: Partial<MongoWord>, gql?: Partial<GQLWord>}) {
@@ -72,7 +73,11 @@ class Word {
     if (typeof mongo.text !== 'undefined') { this.text = mongo.text; }
     if (typeof mongo.definitions !== 'undefined') { this.definitions = (mongo.definitions !== null) ? mongo.definitions.map((d) => new Definition(d._id, { mongo: d })) : null; }
     if (typeof mongo.comittee !== 'undefined') { this.comittee = mongo.comittee; }
-    if (typeof mongo.status !== 'undefined') { this.status = mongo.status; }
+    if (typeof mongo.status !== 'undefined') {
+      if(mongo.status == 'PROPOSING'){ this.status = WordStatus.Proposing }
+      if(mongo.status == 'VOTING'){ this.status = WordStatus.Voting }
+      if(mongo.status == 'CLOSED'){ this.status = WordStatus.Closed }
+    }
     return this;
   }
 

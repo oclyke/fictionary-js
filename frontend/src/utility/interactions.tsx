@@ -81,6 +81,23 @@ export const sortPlayers = (session: any, player: any): (any[] | null) => {
 
 
 
+export const userHasDefined = (word: Word, user: User) => {
+  if (typeof user.id === 'undefined') {
+    throw new Error('user id should not be undefined!')
+  }
+  let result = false;
+  word.definitions.forEach(def => {
+    if (def.author === user.id) {
+      result = true;
+    }
+  })
+  return result;
+}
+
+export const userCanDefine = (word: Word, user: User) => {
+  return (!userHasDefined(word, user));
+}
+
 
 export const userHasVoted = (word: Word, user: User) => {
   if (typeof user.id === 'undefined') {
@@ -96,7 +113,7 @@ export const userHasVoted = (word: Word, user: User) => {
 }
 
 export const userCanVote = (word: Word, user: User) => {
-  return !userHasVoted(word, user);
+  return (!userHasVoted(word, user) && !(word.author === user.id));
 }
 
 export const userCanSee = (def: Definition, word: Word, user: User): boolean => {

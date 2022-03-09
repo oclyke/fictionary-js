@@ -39,13 +39,15 @@ export class Definition {
   }
 }
 
+type WordStatus = string;
+
 export class Word {
   id?: string = undefined;
   author: string | null = null;
   text: string | null = null;
   definitions: Definition[] | null = null;
   comittee: string[] | null = null;
-  status: string | null = null;
+  status: WordStatus = 'PROPOSING';
 
   constructor(id?: string, base?: Partial<Word>) {
     if (typeof id !== 'undefined') { this.id = id; }

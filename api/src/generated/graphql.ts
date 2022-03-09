@@ -40,7 +40,9 @@ export type Mutation = {
   createUser: Maybe<User>;
   joinRoom: Maybe<Room>;
   makeRoom: Maybe<Room>;
+  proposeDefinition: Maybe<Definition>;
   proposeWord: Maybe<Word>;
+  submitVote: Maybe<Definition>;
   updateUser: Maybe<User>;
 };
 
@@ -61,11 +63,27 @@ export type MutationMakeRoomArgs = {
 };
 
 
+export type MutationProposeDefinitionArgs = {
+  definition: Scalars['String'];
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
+  word_id: Scalars['ID'];
+};
+
+
 export type MutationProposeWordArgs = {
   definition: Scalars['String'];
   room_id: Scalars['ID'];
   user_id: Scalars['ID'];
   word: Scalars['String'];
+};
+
+
+export type MutationSubmitVoteArgs = {
+  def_id: Scalars['ID'];
+  room_id: Scalars['ID'];
+  user_id: Scalars['ID'];
+  word_id: Scalars['ID'];
 };
 
 
@@ -123,12 +141,14 @@ export type Word = {
   comittee: Array<Scalars['ID']>;
   definitions: Array<Definition>;
   id: Scalars['ID'];
-  status: Maybe<WordStatus>;
+  status: WordStatus;
   text: Maybe<Scalars['String']>;
 };
 
 export enum WordStatus {
-  None = 'NONE'
+  Closed = 'CLOSED',
+  Proposing = 'PROPOSING',
+  Voting = 'VOTING'
 }
 
 
@@ -312,7 +332,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, never>>;
   joinRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationJoinRoomArgs, 'room_id' | 'user_id'>>;
   makeRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationMakeRoomArgs, 'tag'>>;
+  proposeDefinition: Resolver<Maybe<ResolversTypes['Definition']>, ParentType, ContextType, RequireFields<MutationProposeDefinitionArgs, 'definition' | 'room_id' | 'user_id' | 'word_id'>>;
   proposeWord: Resolver<Maybe<ResolversTypes['Word']>, ParentType, ContextType, RequireFields<MutationProposeWordArgs, 'definition' | 'room_id' | 'user_id' | 'word'>>;
+  submitVote: Resolver<Maybe<ResolversTypes['Definition']>, ParentType, ContextType, RequireFields<MutationSubmitVoteArgs, 'def_id' | 'room_id' | 'user_id' | 'word_id'>>;
   updateUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'id' | 'input'>>;
 };
 
@@ -355,7 +377,7 @@ export type WordResolvers<ContextType = any, ParentType extends ResolversParentT
   comittee: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   definitions: Resolver<Array<ResolversTypes['Definition']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  status: Resolver<Maybe<ResolversTypes['WordStatus']>, ParentType, ContextType>;
+  status: Resolver<ResolversTypes['WordStatus'], ParentType, ContextType>;
   text: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

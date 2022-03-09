@@ -30,6 +30,7 @@ import {
   Word,
   Definition,
   useUser,
+  useRoom,
   usePlayersInfo,
 } from '../hooks';
 
@@ -37,33 +38,15 @@ import {
   userCanSee,
   userCanVote,
   userHasVoted,
+  userCanDefine,
+  userHasDefined,
   maxVotes,
 } from '../utility/interactions';
 
-// import {
-//   CreateSessionInput,
-//   DefinitionInput,
-//   UpdateSessionInput,
-//   WordStatus,
-//   WordInput,
-//   PlayerInput,
-// } from './../API';
-
-// import { usePlayer } from './../hooks/usePlayer';
-// import { useSession } from './../hooks/useSession';
-// import { requestUpdateSession } from '../utility/db';
-
-// import { 
-//   getNumberVoters,
-//   playerHasVoted,
-//   playerCanVote,
-//   playerCanPose,
-//   getStatus,
-//   getMaxVotes,
-//   getPosersList,
-// } from './../utility/words';
-
-// import { v4 as uuidv4 } from 'uuid';
+import {
+  submitVote,
+  proposeDefinition,
+} from '../utility/db';
 
 function shuffle<T>(array: T[]): T[] {
   var m = array.length, t, i;
@@ -520,6 +503,7 @@ type WordCardProps = {
 }
 
 const WordCard = (props: WordCardProps) => {
+  const [room] = useRoom();
   const [user] = useUser();
   const classes = useStyles();
   const word = props.word;
@@ -536,9 +520,14 @@ const WordCard = (props: WordCardProps) => {
 
   const closed = (word.status === 'closed')
   const defined = (word.status === 'defined')
+  const voting = (word.status === 'voting')
   const voted = (word.status === 'voted')
 
   const [players] = usePlayersInfo();
+
+  console.log(word.author)
+  console.log(user.id)
+  console.log({closed, canVote: userCanVote(word, user)});
 
   useEffect(() => {
     console.warn('word status changed', word.status)
@@ -546,6 +535,18 @@ const WordCard = (props: WordCardProps) => {
     setShuffled(shuffle(word.definitions)); // set the shuffled definitions once (to not annoy the user with constantly changing order)
     
   }, [word.status])
+
+  const vote = async () => {
+    if(selected !== null){
+      await submitVote(room.id, user.id, word.id, selected)
+    }else{
+      console.warn('you cant submit a vote without a selection!');
+    }
+  }
+
+  const pose = async () => {
+    await proposeDefinition(room.id, user.id, word.id, posing);
+  }
   
   return <>
     <Box m={1} >
@@ -565,6 +566,8 @@ const WordCard = (props: WordCardProps) => {
           {filtered.map((def, idx) => {
             const correct = (def.author === word.author);
             const author_color = players[def.author].color;
+
+            console.log(user.id === word.author)
 
             return <>
               <Box fontWeight={(!correct || !closed) ? 'fontWeightLight' : 'fontWeightBold'} key={`words.${idx}.${word.id}.defs.${def.id}`}>
@@ -592,7 +595,55 @@ const WordCard = (props: WordCardProps) => {
 
       </CardContent>
       <CardActions>
-        actions standin
+
+        {/* phony definition suggestion */}
+        {userCanDefine(word, user) && <>
+          <InputBase
+            className={classes.input}
+            value={posing}
+            placeholder='phony definition'
+            onChange={(e) => {
+              setPosing(e.target.value.toLowerCase());
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if(posing !== ''){
+                  pose();
+                }
+              }
+            }}
+          />
+          <Divider className={classes.divider} orientation="vertical" />
+          <Tooltip title={`${(posing === '') ? 'phony definition required' : 'pose phony definition'}`}>
+            <span>
+              <IconButton
+                disabled={posing === ''}
+                color='primary'
+                className={classes.iconButton}
+                onClick={(e) => {
+                  pose();
+                }}
+              >
+                <SendRoundedIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </>}
+
+        {/* vote confirmation */}
+        {(voting) && userCanVote(word, user) && <>
+          <Button
+            disabled={(selected === null)}
+            variant='contained'
+            color='primary'
+            onClick={(e) => {
+              vote();
+            }}
+          >
+          vote
+          </Button>
+        </>}
+
       </CardActions>
       </Card>
     </Box>
