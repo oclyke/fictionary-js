@@ -1,0 +1,16 @@
+{
+  "repoURL": "https://github.com/oclyke-dev/fictionary",
+  "releaseURL": "https://github.com/oclyke-dev/fictionary/releases/tag/v0",
+  "frontend": {
+    "version": "v0.0.0",
+    "tag": "v0.0.0",
+    "major": "v0",
+    "basename": "fictionary",
+    "host": "https://games.oclyke.dev"
+  },
+  "api": {
+    "version": "v0.0.0",
+    "gqlEndpoint": "https://games.oclyke.dev/gql/fictionary/v0/api",
+    "sessionEndpoint": "wss://games.oclyke.dev/ws/fictionary/v0/session"
+  }
+}

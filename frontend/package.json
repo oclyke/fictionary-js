@@ -1,0 +1,21 @@
+{
+  "name": "frontend",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "snowpack build",
+    "start": "snowpack dev"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "dotenv": "^16.0.1",
+    "greg": "^0.0.2",
+    "react": "^18.2.0",
+    "react-color": "^2.19.3",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.3.0",
+    "snowpack": "^3.8.8",
+    "typescript": "^4.7.4"
+  }
+}
