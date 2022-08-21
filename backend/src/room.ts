@@ -19,16 +19,17 @@ export {
   Room,
 }
 
-function make_room(tag: string): Room {
+function makeRoom(tag: string): Room {
   return {
     tag,
     players: [],
-    words: []
+    words: [],
+    scores: [],
   }
 }
 
 export async function createRoom(db: Database, tag: string) {
-  const room = make_room(tag)
+  const room = makeRoom(tag)
   const result = await db.rooms.insertOne(room)
   return result.insertedId
 }

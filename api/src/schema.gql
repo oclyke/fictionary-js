@@ -29,6 +29,11 @@ type VoteTuple {
   proposerid: ID! # id of proposer to which the vote goes
 }
 
+type ScoreTuple {
+  id: ID!         # id of player
+  score: Int!     # score of the player
+}
+
 enum WordState {
   OPEN
   VOTING
@@ -48,4 +53,5 @@ type Room {
   tag: String!
   players: [PlayerMapTuple!]!
   words: [Word!]!
+  scores: [ScoreTuple!]!
 }

@@ -63,8 +63,15 @@ export type QueryGetRoomByTagArgs = {
 export type Room = {
   __typename?: 'Room';
   players: Array<PlayerMapTuple>;
+  scores: Array<ScoreTuple>;
   tag: Scalars['String'];
   words: Array<Word>;
+};
+
+export type ScoreTuple = {
+  __typename?: 'ScoreTuple';
+  id: Scalars['ID'];
+  score: Scalars['Int'];
 };
 
 export type VoteTuple = {
@@ -172,6 +179,7 @@ export type ResolversTypes = {
   ProposalTuple: ResolverTypeWrapper<ProposalTuple>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
+  ScoreTuple: ResolverTypeWrapper<ScoreTuple>;
   VoteTuple: ResolverTypeWrapper<VoteTuple>;
   Word: ResolverTypeWrapper<Word>;
   WordState: WordState;
@@ -190,6 +198,7 @@ export type ResolversParentTypes = {
   ProposalTuple: ProposalTuple;
   Query: {};
   Room: Room;
+  ScoreTuple: ScoreTuple;
   VoteTuple: VoteTuple;
   Word: Word;
   AdditionalEntityFields: AdditionalEntityFields;
@@ -274,8 +283,15 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
   players: Resolver<Array<ResolversTypes['PlayerMapTuple']>, ParentType, ContextType>;
+  scores: Resolver<Array<ResolversTypes['ScoreTuple']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ScoreTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScoreTuple'] = ResolversParentTypes['ScoreTuple']> = {
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  score: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -302,6 +318,7 @@ export type Resolvers<ContextType = any> = {
   ProposalTuple: ProposalTupleResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   Room: RoomResolvers<ContextType>;
+  ScoreTuple: ScoreTupleResolvers<ContextType>;
   VoteTuple: VoteTupleResolvers<ContextType>;
   Word: WordResolvers<ContextType>;
 };
