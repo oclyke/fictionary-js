@@ -1,0 +1,55 @@
+scalar IntArrayDict
+scalar PlayerEntryDict
+scalar PlayerPublicDict
+
+type Query {
+  getRoomById(id: ID!): Room
+  getRoomByTag(tag: String!): Room
+}
+
+type Mutation {
+  createRoom(tag: String!): ID
+  createPlayer: ID
+}
+
+type Player {
+  tag: String!
+  color: String!
+  overallScore: Int
+}
+
+type PlayerMapTuple {
+  id: ID!         # id of player
+  player: Player! # player info
+}
+
+type ProposalTuple {
+  id: ID!         # id of proposer
+  value: String!  # proposed definition
+}
+
+type VoteTuple {
+  id: ID!         # id of voter
+  proposerid: ID! # id of proposer to which the vote goes
+}
+
+enum WordState {
+  OPEN
+  VOTING
+  CLOSED
+}
+
+type Word {
+  definition: ID! # id of true proposal
+  authorid: ID!     
+  voters: [ID!]!
+  proposals: [ProposalTuple!]!
+  votes: [VoteTuple!]!
+  state: WordState!
+}
+
+type Room {
+  tag: String!
+  players: [PlayerMapTuple!]!
+  words: [Word!]!
+}

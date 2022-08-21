@@ -9,6 +9,9 @@
     "test-reload": "nodemon --config nodemon.test.json"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.18.10",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/jest": "^28.1.7",
     "dotenv": "^16.0.1",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",

@@ -1,0 +1,8 @@
+{
+  "watch": [
+    "src",
+    "../backend/src"
+  ],
+  "ext": "ts, gql",
+  "exec": "node --experimental-fetch --loader ts-node/esm -r dotenv/config codegen.ts"
+}
