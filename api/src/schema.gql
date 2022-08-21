@@ -1,7 +1,3 @@
-scalar IntArrayDict
-scalar PlayerEntryDict
-scalar PlayerPublicDict
-
 type Query {
   getRoomById(id: ID!): Room
   getRoomByTag(tag: String!): Room

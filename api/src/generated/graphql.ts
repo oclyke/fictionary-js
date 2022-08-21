@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
+import { GraphQLResolveInfo } from 'graphql';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -12,9 +12,6 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  IntArrayDict: any;
-  PlayerEntryDict: any;
-  PlayerPublicDict: any;
 };
 
 export type Mutation = {
@@ -166,15 +163,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  IntArrayDict: ResolverTypeWrapper<Scalars['IntArrayDict']>;
   Mutation: ResolverTypeWrapper<{}>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Player: ResolverTypeWrapper<Player>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  PlayerEntryDict: ResolverTypeWrapper<Scalars['PlayerEntryDict']>;
   PlayerMapTuple: ResolverTypeWrapper<PlayerMapTuple>;
-  PlayerPublicDict: ResolverTypeWrapper<Scalars['PlayerPublicDict']>;
   ProposalTuple: ResolverTypeWrapper<ProposalTuple>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
@@ -187,15 +181,12 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  IntArrayDict: Scalars['IntArrayDict'];
   Mutation: {};
   ID: Scalars['ID'];
   String: Scalars['String'];
   Player: Player;
   Int: Scalars['Int'];
-  PlayerEntryDict: Scalars['PlayerEntryDict'];
   PlayerMapTuple: PlayerMapTuple;
-  PlayerPublicDict: Scalars['PlayerPublicDict'];
   ProposalTuple: ProposalTuple;
   Query: {};
   Room: Room;
@@ -252,10 +243,6 @@ export type MapDirectiveArgs = {
 
 export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export interface IntArrayDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['IntArrayDict'], any> {
-  name: 'IntArrayDict';
-}
-
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createPlayer: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
@@ -268,19 +255,11 @@ export type PlayerResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export interface PlayerEntryDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PlayerEntryDict'], any> {
-  name: 'PlayerEntryDict';
-}
-
 export type PlayerMapTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerMapTuple'] = ResolversParentTypes['PlayerMapTuple']> = {
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   player: Resolver<ResolversTypes['Player'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
-
-export interface PlayerPublicDictScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PlayerPublicDict'], any> {
-  name: 'PlayerPublicDict';
-}
 
 export type ProposalTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProposalTuple'] = ResolversParentTypes['ProposalTuple']> = {
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -317,12 +296,9 @@ export type WordResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
-  IntArrayDict: GraphQLScalarType;
   Mutation: MutationResolvers<ContextType>;
   Player: PlayerResolvers<ContextType>;
-  PlayerEntryDict: GraphQLScalarType;
   PlayerMapTuple: PlayerMapTupleResolvers<ContextType>;
-  PlayerPublicDict: GraphQLScalarType;
   ProposalTuple: ProposalTupleResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   Room: RoomResolvers<ContextType>;

@@ -61,6 +61,11 @@ test('rooms can be created', async () => {
   await expect(createRoom(db, room_tag)).resolves.toBeInstanceOf(ObjectId);
 });
 
+test('two identical tags to fail', async () => {
+  await createRoom(db, room_tag);
+  await expect(createRoom(db, room_tag)).rejects.toThrow('duplicate key error');
+})
+
 test('rooms can be recovered', async () => {
   const id = await createRoom(db, room_tag);
   await expect(getRoom(db, id)).resolves.toHaveProperty('_id', id);

@@ -39,16 +39,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "IntArrayDict",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "Mutation",
         "description": null,
@@ -156,16 +146,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "PlayerEntryDict",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "PlayerMapTuple",
         "description": null,
@@ -205,16 +185,6 @@
         ],
         "inputFields": null,
         "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "PlayerPublicDict",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },

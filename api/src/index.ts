@@ -16,14 +16,13 @@ import {
 } from 'fs';
 
 import {
-  MongoClient
-} from 'mongodb';
+  Database,
+} from '../../backend/src'
 
 import {
-  get_db_client,
-  get_database,
-  Database,
-} from '../../backend/src';
+  getDbClient,
+  getDatabase,
+} from '../../backend/src/utils';
 
 import {
   get_schema,
@@ -53,13 +52,13 @@ const run = async () => {
   console.log('Session websockets using SSL: ', session_using_ssl());
 
   // database connection
-  const client = await get_db_client();
+  const client = await getDbClient();
   try {
     await client.connect();
   } catch (e) {
     console.error('ERROR - db client not connected - ', e);
   }
-  db = get_database(client);
+  db = getDatabase(client);
 
   // websocket server
   const SESSION_PORT = (typeof process.env.SESSION_PORT !== 'undefined') ? parseInt(process.env.SESSION_PORT) : DEFAULT_SESSION_PORT;
