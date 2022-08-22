@@ -23,24 +23,25 @@ import {
 export const resolvers: Resolvers = {
   Query: {
     [`getRoomById`]: async (parent, args) => {
-      return await getRoom(db, new ObjectId(args.id));
+      return getRoom(db, new ObjectId(args.id)).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
     },
     [`getRoomByTag`]: async (parent, args) => {
-      return await getRoomByTag(db, args.tag);
+      return getRoomByTag(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
     },
   },
   Mutation: {
     [`createRoom`]: async (parent, args) => {
-      return await (await createRoom(db, args.tag)).toString();
+      return createRoom(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
     },
     [`createPlayer`]: async (parent, args) => {
-      return await (await createUser(db)).toString();
+      return await createUser(db).then(u => ((u === null) ? u : {...u, _id: u._id.toString()}))
     },
   },
 
   ///////////
   // 
   Player: {
+    [`_id`]: async (parent) => { return parent._id },
     [`tag`]: async (parent) => { return parent.tag },
     [`color`]: async (parent) => { return parent.color },
     [`overallScore`]: async (parent) => { return parent.overallScore },
@@ -54,17 +55,15 @@ export const resolvers: Resolvers = {
     [`state`]: async (parent) => { return parent.state },
   },
   Room: {
+    [`_id`]: async (parent) => { return parent._id },
     [`tag`]: async (parent) => { return parent.tag },
     [`players`]: async (parent) => { return parent.players },
     [`words`]: async (parent) => { return parent.words },
+    [`scores`]: async (parent) => { return parent.scores },
   },
 
   ///////////
   //
-  PlayerMapTuple: {
-    [`id`]: async (parent) => { return parent.id },
-    [`player`]: async (parent) => { return parent.player },
-  },
   ProposalTuple: {
     [`id`]: async (parent) => { return parent.id },
     [`value`]: async (parent) => { return parent.value },
@@ -73,4 +72,8 @@ export const resolvers: Resolvers = {
     [`id`]: async (parent) => { return parent.id },
     [`proposerid`]: async (parent) => { return parent.proposerid },
   },
+  ScoreTuple: {
+    [`id`]: async (parent) => { return parent.id },
+    [`score`]: async (parent) => { return parent.score },
+  }
 }

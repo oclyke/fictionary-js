@@ -64,17 +64,18 @@ test('invalid users are not found', async () => {
 });
 
 test('users can be created', async () => {
-  await expect(createUser(db)).resolves.toBeInstanceOf(ObjectId);
+  const user = await createUser(db);
+  expect(user._id).toBeInstanceOf(ObjectId);
 });
 
 test('users can be deleted', async () => {
-  const userid = await createUser(db);
-  await expect(getUser(db, userid)).resolves.toHaveProperty('_id', userid)
-  await deleteUser(db, userid);
-  await expect(getUser(db, userid)).resolves.toBeNull()
+  const { _id } = await createUser(db);
+  await expect(getUser(db, _id)).resolves.toHaveProperty('_id', _id)
+  await deleteUser(db, _id);
+  await expect(getUser(db, _id)).resolves.toBeNull()
 });
 
 test('users can be recovered', async () => {
-  const id = await createUser(db);
-  await expect(getUser(db, id)).resolves.toHaveProperty('_id', id);
+  const { _id } = await createUser(db);
+  await expect(getUser(db, _id)).resolves.toHaveProperty('_id', _id);
 });

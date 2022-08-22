@@ -1,6 +1,5 @@
 import {
   Collection,
-  OptionalId,
 } from 'mongodb'
 
 import {
@@ -12,6 +11,6 @@ import {
 } from './room'
 
 export interface Database {
-  rooms: Collection<OptionalId<Room>>
-  users: Collection<OptionalId<User>>
+  rooms: Collection<Omit<Room, '_id'>>
+  users: Collection<Omit<User, '_id'>>
 }

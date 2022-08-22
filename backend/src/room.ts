@@ -1,5 +1,6 @@
 import {
   ObjectId,
+  WithId,
 } from 'mongodb'
 
 import {
@@ -19,7 +20,7 @@ export {
   Room,
 }
 
-function makeRoom(tag: string): Room {
+function makeRoom(tag: string): Omit<Room, '_id'> {
   return {
     tag,
     players: [],
@@ -30,8 +31,11 @@ function makeRoom(tag: string): Room {
 
 export async function createRoom(db: Database, tag: string) {
   const room = makeRoom(tag)
-  const result = await db.rooms.insertOne(room)
-  return result.insertedId
+  const { insertedId } = await db.rooms.insertOne(room)
+  return {
+    ...room,
+    _id: insertedId,
+  }
 }
 
 export async function getRoom(db: Database, _id: ObjectId) {
@@ -47,6 +51,7 @@ export async function deleteRoom(db: Database, _id: ObjectId) {
 }
 
 export async function addPlayerToRoom(db: Database, _id: ObjectId, userid: ObjectId) {
-  const {value} = await db.rooms.findOneAndUpdate({_id}, {$push: {players: {id: userid.toString(), player: makeUser()}}}, {returnDocument: 'after'})
+  const player = {...makeUser(), _id: userid.toString()}
+  const {value} = await db.rooms.findOneAndUpdate({_id}, {$push: {players: player}}, {returnDocument: 'after'})
   return value
 }

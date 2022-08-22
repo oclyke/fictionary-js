@@ -28,7 +28,7 @@ function get_random_tag() {
   return [tokens[1], tokens[2]].join('-');
 }
 
-export function makeUser(): User {
+export function makeUser(): Omit<User, '_id'> {
   return {
     tag: get_random_tag(),
     color: get_random_color(),
@@ -38,8 +38,11 @@ export function makeUser(): User {
 
 export async function createUser(db: Database) {
   const user = makeUser()
-  const result = await db.users.insertOne(user)
-  return result.insertedId
+  const { insertedId } = await db.users.insertOne(user)
+  return {
+    ...user,
+    _id: insertedId,
+  }
 }
 
 export async function deleteUser(db: Database, _id: ObjectId) {
@@ -47,7 +50,7 @@ export async function deleteUser(db: Database, _id: ObjectId) {
 }
 
 export async function getUser(db: Database, _id: ObjectId) {
-  return await db.users.findOne({_id})
+  return db.users.findOne({_id})
 }
 
 export async function setUserColor(db: Database, _id: ObjectId, color: string) {

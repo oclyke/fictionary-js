@@ -16,8 +16,8 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPlayer: Maybe<Scalars['ID']>;
-  createRoom: Maybe<Scalars['ID']>;
+  createPlayer: Maybe<Player>;
+  createRoom: Maybe<Room>;
 };
 
 
@@ -27,15 +27,10 @@ export type MutationCreateRoomArgs = {
 
 export type Player = {
   __typename?: 'Player';
+  _id: Maybe<Scalars['ID']>;
   color: Scalars['String'];
   overallScore: Maybe<Scalars['Int']>;
   tag: Scalars['String'];
-};
-
-export type PlayerMapTuple = {
-  __typename?: 'PlayerMapTuple';
-  id: Scalars['ID'];
-  player: Player;
 };
 
 export type ProposalTuple = {
@@ -62,7 +57,8 @@ export type QueryGetRoomByTagArgs = {
 
 export type Room = {
   __typename?: 'Room';
-  players: Array<PlayerMapTuple>;
+  _id: Maybe<Scalars['ID']>;
+  players: Array<Player>;
   scores: Array<ScoreTuple>;
   tag: Scalars['String'];
   words: Array<Word>;
@@ -171,11 +167,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
   Player: ResolverTypeWrapper<Player>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  PlayerMapTuple: ResolverTypeWrapper<PlayerMapTuple>;
   ProposalTuple: ResolverTypeWrapper<ProposalTuple>;
   Query: ResolverTypeWrapper<{}>;
   Room: ResolverTypeWrapper<Room>;
@@ -190,11 +185,10 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Mutation: {};
-  ID: Scalars['ID'];
   String: Scalars['String'];
   Player: Player;
+  ID: Scalars['ID'];
   Int: Scalars['Int'];
-  PlayerMapTuple: PlayerMapTuple;
   ProposalTuple: ProposalTuple;
   Query: {};
   Room: Room;
@@ -253,20 +247,15 @@ export type MapDirectiveArgs = {
 export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createPlayer: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  createRoom: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
+  createPlayer: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
+  createRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
 };
 
 export type PlayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Player'] = ResolversParentTypes['Player']> = {
+  _id: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   color: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   overallScore: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type PlayerMapTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerMapTuple'] = ResolversParentTypes['PlayerMapTuple']> = {
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  player: Resolver<ResolversTypes['Player'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -282,7 +271,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 };
 
 export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
-  players: Resolver<Array<ResolversTypes['PlayerMapTuple']>, ParentType, ContextType>;
+  _id: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  players: Resolver<Array<ResolversTypes['Player']>, ParentType, ContextType>;
   scores: Resolver<Array<ResolversTypes['ScoreTuple']>, ParentType, ContextType>;
   tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;
@@ -314,7 +304,6 @@ export type WordResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = {
   Mutation: MutationResolvers<ContextType>;
   Player: PlayerResolvers<ContextType>;
-  PlayerMapTuple: PlayerMapTupleResolvers<ContextType>;
   ProposalTuple: ProposalTupleResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   Room: RoomResolvers<ContextType>;

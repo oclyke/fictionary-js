@@ -58,7 +58,10 @@ test('invalid rooms are not found', async () => {
 });
 
 test('rooms can be created', async () => {
-  await expect(createRoom(db, room_tag)).resolves.toBeInstanceOf(ObjectId);
+  const room = await createRoom(db, room_tag);
+  expect(room).toHaveProperty('tag', room_tag);
+  expect(room._id).toBeInstanceOf(ObjectId);
+
 });
 
 test('two identical tags to fail', async () => {
@@ -67,8 +70,8 @@ test('two identical tags to fail', async () => {
 })
 
 test('rooms can be recovered', async () => {
-  const id = await createRoom(db, room_tag);
-  await expect(getRoom(db, id)).resolves.toHaveProperty('_id', id);
+  const { _id } = await createRoom(db, room_tag);
+  await expect(getRoom(db, new ObjectId(_id))).resolves.toHaveProperty('_id', _id);
 });
 
 test('rooms can be recovered by tag', async () => {
@@ -78,8 +81,8 @@ test('rooms can be recovered by tag', async () => {
 });
 
 test('rooms can be deleted', async () => {
-  const roomid = await createRoom(db, room_tag);
-  await expect(getRoom(db, roomid)).resolves.toHaveProperty('_id', roomid)
-  await deleteRoom(db, roomid);
-  await expect(getRoom(db, roomid)).resolves.toBeNull()
+  const { _id } = await createRoom(db, room_tag);
+  await expect(getRoom(db, _id)).resolves.toHaveProperty('_id', _id)
+  await deleteRoom(db, _id);
+  await expect(getRoom(db, _id)).resolves.toBeNull()
 });

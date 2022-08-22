@@ -4,19 +4,15 @@ type Query {
 }
 
 type Mutation {
-  createRoom(tag: String!): ID
-  createPlayer: ID
+  createRoom(tag: String!): Room
+  createPlayer: Player
 }
 
 type Player {
+  _id: ID
   tag: String!
   color: String!
   overallScore: Int
-}
-
-type PlayerMapTuple {
-  id: ID!         # id of player
-  player: Player! # player info
 }
 
 type ProposalTuple {
@@ -50,8 +46,9 @@ type Word {
 }
 
 type Room {
+  _id: ID
   tag: String!
-  players: [PlayerMapTuple!]!
+  players: [Player!]!
   words: [Word!]!
   scores: [ScoreTuple!]!
 }
