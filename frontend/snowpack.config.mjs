@@ -35,8 +35,8 @@ function makeConfig () {
       REPO_URL: info.repoURL,
       RELEASE_URL: info.releaseURL,
       FRONTEND_MAJOR: info.frontend.major,
-      GQL_ENDPOINT: info.api.gqlEndpoint,
-      SESSION_ENDPOINT: info.api.sessionEndpoint,
+      GQL_ENDPOINT: 'http://localhost:4000/graphql',
+      SESSION_ENDPOINT: 'ws://localhost:8042',
     },
     routes: [
       {match: 'routes', src: '.*', dest: '/index.html'} // fallback route for SPA https://www.snowpack.dev/guides/routing
@@ -48,6 +48,8 @@ function makeConfig () {
     console.log(info)
     config.buildOptions['baseUrl'] = path.join(info.frontend.host, info.frontend.basename)
     config.env.FRONTEND_BASENAME = info.frontend.basename
+    config.env.GQL_ENDPOINT = info.api.gqlEndpoint
+    config.env.SESSION_ENDPOINT = info.api.sessionEndpoint
   }
 
   return config

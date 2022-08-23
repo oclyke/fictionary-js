@@ -1,6 +1,7 @@
 type Query {
   getRoomById(id: ID!): Room
   getRoomByTag(tag: String!): Room
+  getPlayerById(id: ID!): Player
 }
 
 type Mutation {
@@ -15,9 +16,9 @@ type Player {
   overallScore: Int
 }
 
-type ProposalTuple {
+type DefinitionTuple {
   id: ID!         # id of proposer
-  value: String!  # proposed definition
+  value: String!  # definition
 }
 
 type VoteTuple {
@@ -37,10 +38,9 @@ enum WordState {
 }
 
 type Word {
-  definition: ID! # id of true proposal
-  authorid: ID!     
+  authorid: ID! # the author's id is used to find the 'true' definition
   voters: [ID!]!
-  proposals: [ProposalTuple!]!
+  definitions: [DefinitionTuple!]!
   votes: [VoteTuple!]!
   state: WordState!
 }

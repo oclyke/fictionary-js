@@ -10,11 +10,12 @@ import {
 } from 'react-router-dom'
 
 // @ts-ignore
-import * as greg from 'greg';
+import * as greg from 'greg'
 
 import {
-  fetch_gql,
-} from '../utils';
+  gqlFetch,
+  makeSingle
+} from '../utils'
 
 import {
   FRONTEND_MAJOR,
@@ -22,51 +23,17 @@ import {
   REPO_URL,
 } from '../constants'
 
-function suggest_tag () {
-  const tokens = greg.sentence().split(' ');
-  return [tokens[1], tokens[2]].join('-');
-}
-
-function makeSingle(generator) {
-  let globalNonce;
-  return async function(...args) {
-    const localNonce = globalNonce = new Object();
-
-    const iter = generator(...args);
-    let resumeValue;
-    for (;;) {
-      const n = iter.next(resumeValue);
-      if (n.done) {
-        return n.value;  // final return value of passed generator
-      }
-
-      // whatever the generator yielded, _now_ run await on it
-      resumeValue = await n.value;
-      if (localNonce !== globalNonce) {
-        return;  // a new call was made
-      }
-      // next loop, we give resumeValue back to the generator
-    }
-  };
-}
-
-function* checkTag(value, setter) {
-  const result = yield fetch_gql(`query { getRoomByTag(tag: "${value}"){_id}}`); // check with server to see if this tag exists  
-  setter(prev => ({...prev, exists: (result.data.getRoomByTag !== null)})); // finally update the tag existence
-}
-const checkTagSingle = makeSingle(checkTag);
-
-function validate_tag(value: string): string {
-  const validated = value.toLowerCase().replace(' ', '-');;
-  return validated;
-}
-
-
-
-
-
 export default function () {
+  const navigate = useNavigate()
   const [tag, setTag] = useState<{value: string, exists: boolean}>({value: '', exists: false})
+
+  function* checkTag(tag: string) {
+    // check with server to see if this tag exists
+    const { data: { getRoomByTag: room } } = yield gqlFetch(`query { getRoomByTag(tag: "${tag}"){tag}}`)
+    const exists = room !== null && room.tag === tag
+    setTag(prev => ({...prev, exists }))
+  }
+  const checkTagSingle = makeSingle(checkTag)
 
   const start = false
   const bull = <span className={'bullet'}>•</span>
@@ -79,27 +46,29 @@ export default function () {
           <h1>
             fictionary
           </h1>
+          <button onClick={() => {
+            const value = suggestTag();
+            const validated = validateTag(value);
+            setTag(prev => ({...prev, value: validated})); // set tag immediately
+            checkTagSingle(validated); // check tag for existence w/ preemption
+          }}>
+            suggest tag
+          </button>
           <div>
-            {/* <SessionSelector
-              id={tag}
-              join={idactive}
-              onSuggest={async (e) => {
-                const newid = suggestId();
-                settag(newid);
-                const active: boolean = await tagActive(newid);
-                setIDActive(active);
+            <input
+              onChange={async e => {
+                const value = e.target.value; // handle the user's typing
+                const validated = validateTag(value);
+                setTag(prev => ({...prev, value: validated})); // set tag immediately
+                checkTagSingle(validated); // check tag for existence w/ preemption
               }}
-              onChange={async (e) => {
-                const newid = e.target.value;
-                settag(newid);
-                const active: boolean = await tagActive(newid);
-                setIDActive(active);
+              onKeyDown={async e => {
+                if (e.key === 'Enter') {
+                  navigate(`/${tag.value}`);
+                }
               }}
-              onSubmit={(e) => {
-                preventDefault(e);
-                setStart(true);
-              }}
-            /> */}
+            />
+            {tag.exists ? '->' : '+'}
           </div>
           <h2 color='textSecondary' style={{fontSize: 24, marginTop: '16px'}}>
             fic{bull}tion{bull}ar{bull}y
@@ -232,4 +201,14 @@ export default function () {
       </div>
     </div>
   </>
+}
+
+function suggestTag () {
+  const tokens = greg.sentence().split(' ')
+  return [tokens[1], tokens[2]].join('-')
+}
+
+function validateTag(value: string): string {
+  const validated = value.toLowerCase().replace(' ', '-')
+  return validated
 }

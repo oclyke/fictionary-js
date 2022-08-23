@@ -14,6 +14,7 @@ import {
 
 import {
   createUser,
+  getUser,
 } from '../../backend/src/user';
 
 import {
@@ -27,6 +28,9 @@ export const resolvers: Resolvers = {
     },
     [`getRoomByTag`]: async (parent, args) => {
       return getRoomByTag(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
+    },
+    [`getPlayerById`]: async (parent, args) => {
+      return getUser(db, new ObjectId(args.id)).then(p => ((p === null) ? p : {...p, _id: p._id.toString()}))
     },
   },
   Mutation: {
@@ -50,8 +54,7 @@ export const resolvers: Resolvers = {
     [`authorid`]: async (parent) => { return parent.authorid },
     [`voters`]: async (parent) => { return parent.voters },
     [`votes`]: async (parent) => { return parent.votes },
-    [`definition`]: async (parent) => { return parent.definition },
-    [`proposals`]: async (parent) => { return parent.proposals },
+    [`definitions`]: async (parent) => { return parent.definitions },
     [`state`]: async (parent) => { return parent.state },
   },
   Room: {
@@ -64,7 +67,7 @@ export const resolvers: Resolvers = {
 
   ///////////
   //
-  ProposalTuple: {
+  DefinitionTuple: {
     [`id`]: async (parent) => { return parent.id },
     [`value`]: async (parent) => { return parent.value },
   },

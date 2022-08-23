@@ -18,9 +18,8 @@ export {
 export function makeWord(authorid: string, definition: string, voters: string[]): Word {
   return {
     authorid,
-    definition,
     voters,
-    proposals: [
+    definitions: [
       {id: authorid, value: definition},
     ],
     votes: [],
@@ -34,8 +33,12 @@ export async function addWordToRoom(db: Database, roomid: ObjectId, authorid: Ob
     return null
   }
   const author_id_string = authorid.toString()
-  const voters = room.players.map(t => t.id).filter(id => id !== author_id_string)
+  const voters: string[] = room.players.map(t => t._id).filter(id => (isString(id) && (id !== author_id_string))) as string[]
   
   const {value} = await db.rooms.findOneAndUpdate({_id: roomid}, {$push: {words: makeWord(author_id_string, definition, voters)}}, {returnDocument: 'after'})
   return value
+}
+
+function isString(id: any): id is string {
+  return (typeof id === 'string') ? true : false
 }
