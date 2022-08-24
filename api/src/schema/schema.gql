@@ -1,0 +1,117 @@
+type Query {
+  gameById(id: ID!): Game
+  gameByTag(tag: String!): Game
+  player(id: ID!): Player
+  meta: Meta
+  node(id: ID!): Node
+}
+
+type Mutation {
+  createRoom(tag: String!): Room
+  createPlayer: Player
+}
+
+interface Node {
+  id: ID!
+}
+
+# the Meta node lists information about
+# fictionary itself
+type Meta : Node {
+  id: ID!
+  name: String
+  games(input: listRoomsInput, first: Int, last: Int, after: String, before: String): GameConnection
+  players(input: listPlayersInput, first: Int, last: Int, after: String, before: String): PlayerConnection
+}
+
+# a Definition is a word-definition pair
+# stored on the database
+type Definition : Node {
+  id: ID!
+  word: String
+  definition: String
+  contributors: PlayerConnection
+}
+
+# a Player is an individual participant
+type Player : Node {
+  id: ID!
+  name: String
+  color: String
+  overallScore: Int
+  gamesHistoryConnection: GameConnection
+}
+
+# a Game is a record of interactions between
+# Players while playing the game
+type Game : Node {
+  id: ID!
+  name: String!
+  players: PlayerConnection
+  words: [Word!]!
+  scores: [ScoreTuple!]!
+  created: String!
+  updated: String!
+
+  addPlayer(userid: ID!): AddPlayerPayload
+}
+
+type ScoreTuple {
+  id: ID!         # id of player
+  score: Int!     # score of the player
+}
+
+# Word is not a node - it exists only within
+# the context of a Game (see Definition for 
+# a Node which persists word-definition pairs)
+type Word {
+  value: String!
+  authorid: ID! # the author's id is used to find the 'true' definition
+  voters: [ID!]!
+  definitions: [DefinitionTuple!]!
+  votes: [VoteTuple!]!
+  state: WordState!
+}
+
+type DefinitionTuple {
+  id: ID!         # id of proposer
+  value: String!  # definition
+}
+
+type VoteTuple {
+  id: ID!         # id of voter
+  proposerId: ID! # id of proposer to which the vote goes
+}
+
+enum WordState {
+  OPEN
+  VOTING
+  CLOSED
+}
+
+### connection types
+type PlayerConnection {
+  edges: [PlayerEdge]
+  pageInfo: PageInfo!
+}
+type PlayerEdge {
+  cursor: String!
+  node: Player
+}
+
+type GameConnection {
+  edges: [GameEdge]
+  pageInfo: PageInfo!
+}
+type GameEdge {
+  cursor: String!
+  node: Game
+}
+
+### PageInfo
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}

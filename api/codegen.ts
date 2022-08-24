@@ -3,18 +3,12 @@ import {
 } from 'apollo-server'
 
 import {
-  get_schema,
-} from './src/utils'
-
-import {
-  prepare,
-} from './codegen.schema'
+  schema,
+} from './src/schema'
 
 async function run () {
-  const schema = await prepare()
   const server = new ApolloServer({
     persistedQueries: false,
-    // typeDefs: get_schema(),
     typeDefs: schema,
     // resolvers,
     context: ({ req }) => {
