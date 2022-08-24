@@ -455,8 +455,7 @@ const { connectionType: GameConnection } = connectionDefinitions({
     },
     meta: {
       type: MetaType,
-      // resolve: () => { console.warn('unimplemented'); return getMeta('naught') },
-      resolve: () => ({id: "sdfsdf"}),
+      resolve: () => { console.warn('unimplemented'); return getMeta('naught') },
     },
     node: nodeField,
   }),

@@ -1,8 +1,12 @@
+import {
+  PlayerConnection,
+} from '.'
+
 // the Game type holds information about fictionary games
 interface Game {
   id: string
   name: string
-  // players: PlayerConnection
+  players: typeof PlayerConnection
   words: Word[]
   scores: {[key: string]: number} // map player ids to their scores
   created: string
@@ -43,20 +47,28 @@ function makeWord(players: string[]): Word {
 // meta is hardcoded right now
 import { getMeta } from './meta'
 const meta = getMeta('naught')
-if (typeof meta === 'undefined') {
-  throw new Error('could not get root meta type')
+
+function makeGame (idx: number) {
+  if (typeof meta === 'undefined') {
+    throw new Error('could not get root meta type')
+  }
+  return ({
+    id: String(idx),
+    name: `game-name-${idx}`,
+    players: PlayerConnection,
+    words: [...new Array(idx)].map((_ => makeWord(meta.players))),
+    scores: {},
+    created: new Date().toDateString(),
+    updated: new Date().toDateString(),
+  })
 }
 
-const allGames: Game[] = [...new Array(7)].map((_, idx) => ({
-  id: String(idx),
-  name: `game-name-${idx}`,
-  // players: PlayerConnection
-  words: [...new Array(idx)].map((_ => makeWord(meta?.players))),
-  scores: {},
-  created: new Date().toDateString(),
-  updated: new Date().toDateString(),
-}))
+const allGames: Game[] = [...new Array(7)].map((_, idx) => makeGame(idx))
 
 export function getGame(id: string) {
-  return allGames.find(g => g.id === id)
+  const game = allGames.find(g => g.id === id)
+  if(typeof game === 'undefined'){
+    return null
+  }
+  return game
 }

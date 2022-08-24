@@ -5,9 +5,7 @@ import {
 import {
   Resolvers,
   Maybe,
-  ListRoomsInput,
-  RoomEdge,
-  RoomConnection,
+  Game,
 } from './generated/graphql'
 
 import {
@@ -34,98 +32,98 @@ import {
   db,
 } from '.';
 
+import {
+  getGame,
+} from './schema/game'
+
 export const resolvers: Resolvers = {
   Query: {
-    [`players`]: async (parent, args) => {
+    [`gameById`]: async (parent, args) => {
+      const game = getGame('0')
+      return game
+    },
+    [`gameByTag`]: async (parent, args) => {
+      const game = getGame('0')
+      return game
+    },
+    [`player`]: async (parent, args) => {
       return null
     },
-    [`rooms`]: async (parent, args) => {
-      return getRoomsResolver(db, args.input, args.first, args.last, args.after, args.before)
+    [`meta`]: async (parent, args) => {
+      return null
     },
-    [`getRoomById`]: async (parent, args) => {
-      return getRoom(db, new ObjectId(args.id)).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
-    },
-    [`getRoomByTag`]: async (parent, args) => {
-      return getRoomByTag(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
-    },
-    [`getPlayerById`]: async (parent, args) => {
-      return getUser(db, new ObjectId(args.id)).then(p => ((p === null) ? p : {...p, _id: p._id.toString()}))
+    [`node`]: async (parent, args) => {
+      return null
     },
   },
   Mutation: {
-    [`createRoom`]: async (parent, args) => {
-      return createRoom(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
-    },
-    [`createPlayer`]: async (parent, args) => {
-      return await createUser(db).then(u => ((u === null) ? u : {...u, _id: u._id.toString()}))
-    },
-    [`addPlayerToRoom`]: async (parent, args) => {
-      return await addPlayerToRoom(db, new ObjectId(args.roomid), new ObjectId(args.userid)).then(u => ((u === null) ? u : {...u, _id: u._id.toString()}))
-    },
+    // [`createRoom`]: async (parent, args) => {
+    //   // return createRoom(db, args.tag).then(r => ((r === null) ? r : {...r, _id: r._id.toString()}))
+    // },
   },
 
   ///////////
   // 
-  Player: {
-    [`_id`]: async (parent) => { return parent._id },
-    [`tag`]: async (parent) => { return parent.tag },
-    [`color`]: async (parent) => { return parent.color },
-    [`overallScore`]: async (parent) => { return parent.overallScore },
-  },
-  Word: {
-    [`authorid`]: async (parent) => { return parent.authorid },
-    [`voters`]: async (parent) => { return parent.voters },
-    [`votes`]: async (parent) => { return parent.votes },
-    [`definitions`]: async (parent) => { return parent.definitions },
-    [`state`]: async (parent) => { return parent.state },
-  },
-  Room: {
-    [`_id`]: async (parent) => { return parent._id },
-    [`tag`]: async (parent) => { return parent.tag },
-    [`players`]: async (parent) => { return parent.players },
-    [`words`]: async (parent) => { return parent.words },
-    [`scores`]: async (parent) => { return parent.scores },
-  },
+  // Player: {
+  //   [`_id`]: async (parent) => { return parent._id },
+  //   [`tag`]: async (parent) => { return parent.tag },
+  //   [`color`]: async (parent) => { return parent.color },
+  //   [`overallScore`]: async (parent) => { return parent.overallScore },
+  // },
+  // Word: {
+  //   [`authorid`]: async (parent) => { return parent.authorid },
+  //   [`voters`]: async (parent) => { return parent.voters },
+  //   [`votes`]: async (parent) => { return parent.votes },
+  //   [`definitions`]: async (parent) => { return parent.definitions },
+  //   [`state`]: async (parent) => { return parent.state },
+  // },
+  // Room: {
+  //   [`_id`]: async (parent) => { return parent._id },
+  //   [`tag`]: async (parent) => { return parent.tag },
+  //   [`players`]: async (parent) => { return parent.players },
+  //   [`words`]: async (parent) => { return parent.words },
+  //   [`scores`]: async (parent) => { return parent.scores },
+  // },
 
   ///////////
   //
-  DefinitionTuple: {
-    [`id`]: async (parent) => { return parent.id },
-    [`value`]: async (parent) => { return parent.value },
-  },
-  VoteTuple: {
-    [`id`]: async (parent) => { return parent.id },
-    [`proposerid`]: async (parent) => { return parent.proposerid },
-  },
-  ScoreTuple: {
-    [`id`]: async (parent) => { return parent.id },
-    [`score`]: async (parent) => { return parent.score },
-  },
+  // DefinitionTuple: {
+  //   [`id`]: async (parent) => { return parent.id },
+  //   [`value`]: async (parent) => { return parent.value },
+  // },
+  // VoteTuple: {
+  //   [`id`]: async (parent) => { return parent.id },
+  //   [`proposerid`]: async (parent) => { return parent.proposerid },
+  // },
+  // ScoreTuple: {
+  //   [`id`]: async (parent) => { return parent.id },
+  //   [`score`]: async (parent) => { return parent.score },
+  // },
 
   ////////////
   //
-  RoomEdge: {
-    [`cursor`]: async (parent) => { return parent.cursor },
-    [`node`]: async (parent) => { return parent.node },
-  },
-  PlayerEdge: {
-    [`cursor`]: async (parent) => { return parent.cursor },
-    [`node`]: async (parent) => { return parent.node },
-  },
-  PageInfo: {
-    [`hasPreviousPage`]: async (parent) => { return parent.hasPreviousPage },
-    [`hasNextPage`]: async (parent) => { return parent.hasNextPage },
-    [`startCursor`]: async (parent) => { return parent.startCursor },
-    [`endCursor`]: async (parent) => { return parent.endCursor },
-  },
-  PlayerConnection: {
-    [`edges`]: async (parent) => { return parent.edges },
-    [`pageInfo`]: async (parent) => { return parent.pageInfo },
-  },
-  RoomConnection: {
-    [`edges`]: async (parent) => { return parent.edges },
-    [`pageInfo`]: async (parent) => { return parent.pageInfo },
-  },
+  // RoomEdge: {
+  //   [`cursor`]: async (parent) => { return parent.cursor },
+  //   [`node`]: async (parent) => { return parent.node },
+  // },
+  // PlayerEdge: {
+  //   [`cursor`]: async (parent) => { return parent.cursor },
+  //   [`node`]: async (parent) => { return parent.node },
+  // },
+  // PageInfo: {
+  //   [`hasPreviousPage`]: async (parent) => { return parent.hasPreviousPage },
+  //   [`hasNextPage`]: async (parent) => { return parent.hasNextPage },
+  //   [`startCursor`]: async (parent) => { return parent.startCursor },
+  //   [`endCursor`]: async (parent) => { return parent.endCursor },
+  // },
+  // PlayerConnection: {
+  //   [`edges`]: async (parent) => { return parent.edges },
+  //   [`pageInfo`]: async (parent) => { return parent.pageInfo },
+  // },
+  // RoomConnection: {
+  //   [`edges`]: async (parent) => { return parent.edges },
+  //   [`pageInfo`]: async (parent) => { return parent.pageInfo },
+  // },
 }
 
 export async function getRoomsResolver(
