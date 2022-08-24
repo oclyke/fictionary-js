@@ -24,6 +24,7 @@
     "eslint-import-resolver-typescript": "^3.4.2",
     "eslint-plugin-import": "^2.26.0",
     "graphql": "^16.6.0",
+    "graphql-relay": "^0.10.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.9.0",
     "nodemon": "^2.0.19",

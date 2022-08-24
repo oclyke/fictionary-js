@@ -6,10 +6,16 @@ import {
   get_schema,
 } from './src/utils'
 
+import {
+  prepare,
+} from './codegen.schema'
+
 async function run () {
+  const schema = await prepare()
   const server = new ApolloServer({
     persistedQueries: false,
-    typeDefs: get_schema(),
+    // typeDefs: get_schema(),
+    typeDefs: schema,
     // resolvers,
     context: ({ req }) => {
       const token = req.headers.authorization || '';
