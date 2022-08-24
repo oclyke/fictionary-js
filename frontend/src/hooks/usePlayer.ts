@@ -66,22 +66,19 @@ export function usePlayerCore(persistence: PersistantStorage): [(string | null),
       throw new Error('already ensuring user');
     }
     const localid = persistence.load();
-    console.log('localid: ', localid)
     if(!localid){
       lock.current = true; // lock user creation b/c react may load and unload this component while the user is created
       try {
         const { data: { createPlayer: player } } = await gqlFetch(`mutation { createPlayer { _id } }`)
         const playerid = player._id
-        
         persistence.store(playerid);
-        console.log('got new player id', playerid);
         setPlayerId(playerid);
       } finally {
         lock.current = false; // unlock
         return playerid
       }
     } else {
-      const { data: { getPlayerById: player } } = await gqlFetch(`query { getPlayerById(id: ${localid}){ _id } }`)
+      const { data: { getPlayerById: player } } = await gqlFetch(`query { getPlayerById(id: "${localid}"){ _id } }`)
       if(player === null){
         persistence.clear(); // try to remedy this...
         setPlayerId(null)

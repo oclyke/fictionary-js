@@ -60,9 +60,13 @@ export function useRoom(): UseRoomReturn {
   async function join(tag: string, userid: string) {
     const roomid = await ensureRoom(tag)
     roomid_ref.current = roomid
-    const { data: { getRoomByTag: room } } = await gqlFetch(`query { getRoomById(id: ${roomid}){ players { _id } } }`)
+    const { data: { getRoomById: room } } = await gqlFetch(`query { getRoomById(id: "${roomid}"){ players { _id } } }`)
+    if (room === null) {
+      throw new Error(`could not find room with tag: ${tag}`)
+    }
     if (!room.players.includes(userid)) {
-      await gqlFetch(`mutation { addPlayerToRoom(roomid: ${roomid}, userid: ${userid}){ { _id players { _id } } } }`)
+      console.log(`adding player to room (${userid} to ${roomid})`)
+      await gqlFetch(`mutation { addPlayerToRoom(roomid: "${roomid}", userid: "${userid}"){ { _id players { _id } } } }`)
     }
     update()
   }

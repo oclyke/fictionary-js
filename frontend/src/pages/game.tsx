@@ -54,22 +54,36 @@ export default function () {
 
   }
 
+  // manage session
   useEffect(() => {
-    async function executor () {
-      await connect()
-      const playerid = await ensurePlayer()
-
-      if (typeof tag === 'undefined') {
-        throw new Error('expected tag to be defined')
-      }
-      if (playerid === null) {
-        throw new Error('expected playerid to be defined')
-      }
-
-      join(tag, playerid)
+    connect()
+    if (roomid !== null) {
+      console.log('associating roomid')
+      associate({roomid})
     }
-    executor()
+    if (userid !== null && typeof userid !== 'undefined') {
+      console.log('associating userid')
+      associate({userid})
+    }
+    return function cleanup () {
+      disconnect()
+    }
+  }, [roomid, userid])
+
+  // manage player
+  useEffect(() => {
+    ensurePlayer()
+  }, [userid])
+
+  // manage room
+  useEffect(() => {
+    
+    if ( typeof tag !== 'undefined' && userid !== null) {
+      join(tag, userid)
+    }
   }, [tag, userid])
+
+  console.log({userid, tag, room})
 
   return <>
     game page
