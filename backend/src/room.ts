@@ -5,6 +5,7 @@ import {
 
 import {
   Database,
+  DBRoom,
 } from '.'
 
 import {
@@ -14,10 +15,17 @@ import {
 
 import {
   Room,
+  ListRoomsInput,
+  Maybe,
 } from '../../api/src/generated/graphql'
 
 export {
   Room,
+}
+
+export function isDBroom (r: any): r is DBRoom {
+  if (r === null) { return false }
+  return true
 }
 
 function makeRoom(tag: string): Omit<Room, '_id'> {
@@ -48,6 +56,28 @@ export async function getRoomByTag(db: Database, tag: string) {
 
 export async function deleteRoom(db: Database, _id: ObjectId) {
   return await db.rooms.deleteOne({_id})
+}
+
+export async function getRoomsCursor(db: Database, input?: Maybe<ListRoomsInput>) {
+  const filter: {
+    tag?: {
+      eq?: string
+    },
+    id?: {
+      eq?: string
+    },
+  } = {}
+  if (input !== null && typeof input !== 'undefined'){
+    if (input.tag !== null) {
+      filter.tag = {}
+      if (input.tag.eq !== null) { filter.tag.eq = input.tag.eq }
+    }
+    if (input.id !== null) {
+      filter.id = {}
+      if (input.id.eq !== null) { filter.id.eq = input.id.eq }
+    }
+  }
+  return db.rooms.find(filter)
 }
 
 export async function addPlayerToRoom(db: Database, _id: ObjectId, userid: ObjectId) {

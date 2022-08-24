@@ -1,12 +1,45 @@
 type Query {
+  # client api
   getRoomById(id: ID!): Room
   getRoomByTag(tag: String!): Room
   getPlayerById(id: ID!): Player
+
+  # information about fictionary
+  rooms(input: listRoomsInput, first: Int, last: Int, after: String, before: String): RoomConnection
+  players(input: listPlayersInput, first: Int, last: Int, after: String, before: String): PlayerConnection
 }
 
 type Mutation {
   createRoom(tag: String!): Room
   createPlayer: Player
+  addPlayerToRoom(roomid: ID!, userid: ID!): Room
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+type RoomConnection {
+  edges: [RoomEdge]
+  pageInfo: PageInfo!
+}
+
+type RoomEdge {
+  node: Room
+  cursor: String!
+}
+
+type PlayerConnection {
+  edges: [PlayerEdge]
+  pageInfo: PageInfo!
+}
+
+type PlayerEdge {
+  node: Player
+  cursor: String!
 }
 
 type Player {
@@ -14,6 +47,13 @@ type Player {
   tag: String!
   color: String!
   overallScore: Int
+}
+
+input listPlayersInput {
+  id: stringFilterInput
+  tag: stringFilterInput
+  color: stringFilterInput
+  overallScore: intFilterInput
 }
 
 type DefinitionTuple {
@@ -51,4 +91,22 @@ type Room {
   players: [Player!]!
   words: [Word!]!
   scores: [ScoreTuple!]!
+}
+
+input listRoomsInput {
+  id: stringFilterInput
+  tag: stringFilterInput
+}
+
+input stringFilterInput {
+  eq: String
+  # regex: String
+}
+
+input intFilterInput {
+  eq: Int
+  gt: Int
+  gte: Int
+  lt: Int
+  lte: Int
 }

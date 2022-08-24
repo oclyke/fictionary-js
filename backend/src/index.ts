@@ -10,7 +10,10 @@ import {
   Room,
 } from './room'
 
+export type DBRoom = Omit<Room, '_id'>
+export type DBUser = Omit<User, '_id'>
+
 export interface Database {
-  rooms: Collection<Omit<Room, '_id'>>
-  users: Collection<Omit<User, '_id'>>
+  rooms: Collection<DBRoom>
+  users: Collection<DBUser>
 }
