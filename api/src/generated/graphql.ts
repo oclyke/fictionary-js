@@ -14,170 +14,106 @@ export type Scalars = {
   Float: number;
 };
 
-export type DefinitionTuple = {
-  __typename?: 'DefinitionTuple';
+/** A faction in the Star Wars saga */
+export type Faction = Node & {
+  __typename?: 'Faction';
+  /** The ID of an object */
   id: Scalars['ID'];
-  value: Scalars['String'];
+  /** The name of the faction. */
+  name: Maybe<Scalars['String']>;
+  /** The ships used by the faction. */
+  ships: Maybe<ShipConnection>;
+};
+
+
+/** A faction in the Star Wars saga */
+export type FactionShipsArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
+};
+
+export type IntroduceShipInput = {
+  clientMutationId: InputMaybe<Scalars['String']>;
+  factionId: Scalars['ID'];
+  shipName: Scalars['String'];
+};
+
+export type IntroduceShipPayload = {
+  __typename?: 'IntroduceShipPayload';
+  clientMutationId: Maybe<Scalars['String']>;
+  faction: Maybe<Faction>;
+  ship: Maybe<Ship>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addPlayerToRoom: Maybe<Room>;
-  createPlayer: Maybe<Player>;
-  createRoom: Maybe<Room>;
+  introduceShip: Maybe<IntroduceShipPayload>;
 };
 
 
-export type MutationAddPlayerToRoomArgs = {
-  roomid: Scalars['ID'];
-  userid: Scalars['ID'];
+export type MutationIntroduceShipArgs = {
+  input: IntroduceShipInput;
 };
 
-
-export type MutationCreateRoomArgs = {
-  tag: Scalars['String'];
+/** An object with an ID */
+export type Node = {
+  /** The id of the object. */
+  id: Scalars['ID'];
 };
 
+/** Information about pagination in a connection. */
 export type PageInfo = {
   __typename?: 'PageInfo';
-  endCursor: Scalars['String'];
+  /** When paginating forwards, the cursor to continue. */
+  endCursor: Maybe<Scalars['String']>;
+  /** When paginating forwards, are there more items? */
   hasNextPage: Scalars['Boolean'];
+  /** When paginating backwards, are there more items? */
   hasPreviousPage: Scalars['Boolean'];
-  startCursor: Scalars['String'];
-};
-
-export type Player = {
-  __typename?: 'Player';
-  _id: Maybe<Scalars['ID']>;
-  color: Scalars['String'];
-  overallScore: Maybe<Scalars['Int']>;
-  tag: Scalars['String'];
-};
-
-export type PlayerConnection = {
-  __typename?: 'PlayerConnection';
-  edges: Maybe<Array<Maybe<PlayerEdge>>>;
-  pageInfo: PageInfo;
-};
-
-export type PlayerEdge = {
-  __typename?: 'PlayerEdge';
-  cursor: Scalars['String'];
-  node: Maybe<Player>;
+  /** When paginating backwards, the cursor to continue. */
+  startCursor: Maybe<Scalars['String']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  getPlayerById: Maybe<Player>;
-  getRoomById: Maybe<Room>;
-  getRoomByTag: Maybe<Room>;
-  players: Maybe<PlayerConnection>;
-  rooms: Maybe<RoomConnection>;
+  empire: Maybe<Faction>;
+  /** Fetches an object given its ID */
+  node: Maybe<Node>;
+  rebels: Maybe<Faction>;
 };
 
 
-export type QueryGetPlayerByIdArgs = {
+export type QueryNodeArgs = {
   id: Scalars['ID'];
 };
 
-
-export type QueryGetRoomByIdArgs = {
+/** A ship in the Star Wars saga */
+export type Ship = Node & {
+  __typename?: 'Ship';
+  /** The ID of an object */
   id: Scalars['ID'];
+  /** The name of the ship. */
+  name: Maybe<Scalars['String']>;
 };
 
-
-export type QueryGetRoomByTagArgs = {
-  tag: Scalars['String'];
-};
-
-
-export type QueryPlayersArgs = {
-  after: InputMaybe<Scalars['String']>;
-  before: InputMaybe<Scalars['String']>;
-  first: InputMaybe<Scalars['Int']>;
-  input: InputMaybe<ListPlayersInput>;
-  last: InputMaybe<Scalars['Int']>;
-};
-
-
-export type QueryRoomsArgs = {
-  after: InputMaybe<Scalars['String']>;
-  before: InputMaybe<Scalars['String']>;
-  first: InputMaybe<Scalars['Int']>;
-  input: InputMaybe<ListRoomsInput>;
-  last: InputMaybe<Scalars['Int']>;
-};
-
-export type Room = {
-  __typename?: 'Room';
-  _id: Maybe<Scalars['ID']>;
-  players: Array<Player>;
-  scores: Array<ScoreTuple>;
-  tag: Scalars['String'];
-  words: Array<Word>;
-};
-
-export type RoomConnection = {
-  __typename?: 'RoomConnection';
-  edges: Maybe<Array<Maybe<RoomEdge>>>;
+/** A connection to a list of items. */
+export type ShipConnection = {
+  __typename?: 'ShipConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<Maybe<ShipEdge>>>;
+  /** Information to aid in pagination. */
   pageInfo: PageInfo;
 };
 
-export type RoomEdge = {
-  __typename?: 'RoomEdge';
+/** An edge in a connection. */
+export type ShipEdge = {
+  __typename?: 'ShipEdge';
+  /** A cursor for use in pagination */
   cursor: Scalars['String'];
-  node: Maybe<Room>;
-};
-
-export type ScoreTuple = {
-  __typename?: 'ScoreTuple';
-  id: Scalars['ID'];
-  score: Scalars['Int'];
-};
-
-export type VoteTuple = {
-  __typename?: 'VoteTuple';
-  id: Scalars['ID'];
-  proposerid: Scalars['ID'];
-};
-
-export type Word = {
-  __typename?: 'Word';
-  authorid: Scalars['ID'];
-  definitions: Array<DefinitionTuple>;
-  state: WordState;
-  voters: Array<Scalars['ID']>;
-  votes: Array<VoteTuple>;
-};
-
-export enum WordState {
-  Closed = 'CLOSED',
-  Open = 'OPEN',
-  Voting = 'VOTING'
-}
-
-export type IntFilterInput = {
-  eq: InputMaybe<Scalars['Int']>;
-  gt: InputMaybe<Scalars['Int']>;
-  gte: InputMaybe<Scalars['Int']>;
-  lt: InputMaybe<Scalars['Int']>;
-  lte: InputMaybe<Scalars['Int']>;
-};
-
-export type ListPlayersInput = {
-  color: InputMaybe<StringFilterInput>;
-  id: InputMaybe<StringFilterInput>;
-  overallScore: InputMaybe<IntFilterInput>;
-  tag: InputMaybe<StringFilterInput>;
-};
-
-export type ListRoomsInput = {
-  id: InputMaybe<StringFilterInput>;
-  tag: InputMaybe<StringFilterInput>;
-};
-
-export type StringFilterInput = {
-  eq: InputMaybe<Scalars['String']>;
+  /** The item at the end of the edge */
+  node: Maybe<Ship>;
 };
 
 export type AdditionalEntityFields = {
@@ -254,54 +190,39 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  DefinitionTuple: ResolverTypeWrapper<DefinitionTuple>;
+  Faction: ResolverTypeWrapper<Faction>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  IntroduceShipInput: IntroduceShipInput;
+  IntroduceShipPayload: ResolverTypeWrapper<IntroduceShipPayload>;
   Mutation: ResolverTypeWrapper<{}>;
+  Node: ResolversTypes['Faction'] | ResolversTypes['Ship'];
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  Player: ResolverTypeWrapper<Player>;
-  Int: ResolverTypeWrapper<Scalars['Int']>;
-  PlayerConnection: ResolverTypeWrapper<PlayerConnection>;
-  PlayerEdge: ResolverTypeWrapper<PlayerEdge>;
   Query: ResolverTypeWrapper<{}>;
-  Room: ResolverTypeWrapper<Room>;
-  RoomConnection: ResolverTypeWrapper<RoomConnection>;
-  RoomEdge: ResolverTypeWrapper<RoomEdge>;
-  ScoreTuple: ResolverTypeWrapper<ScoreTuple>;
-  VoteTuple: ResolverTypeWrapper<VoteTuple>;
-  Word: ResolverTypeWrapper<Word>;
-  WordState: WordState;
-  intFilterInput: IntFilterInput;
-  listPlayersInput: ListPlayersInput;
-  listRoomsInput: ListRoomsInput;
-  stringFilterInput: StringFilterInput;
+  Ship: ResolverTypeWrapper<Ship>;
+  ShipConnection: ResolverTypeWrapper<ShipConnection>;
+  ShipEdge: ResolverTypeWrapper<ShipEdge>;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  DefinitionTuple: DefinitionTuple;
+  Faction: Faction;
   ID: Scalars['ID'];
   String: Scalars['String'];
+  Int: Scalars['Int'];
+  IntroduceShipInput: IntroduceShipInput;
+  IntroduceShipPayload: IntroduceShipPayload;
   Mutation: {};
+  Node: ResolversParentTypes['Faction'] | ResolversParentTypes['Ship'];
   PageInfo: PageInfo;
   Boolean: Scalars['Boolean'];
-  Player: Player;
-  Int: Scalars['Int'];
-  PlayerConnection: PlayerConnection;
-  PlayerEdge: PlayerEdge;
   Query: {};
-  Room: Room;
-  RoomConnection: RoomConnection;
-  RoomEdge: RoomEdge;
-  ScoreTuple: ScoreTuple;
-  VoteTuple: VoteTuple;
-  Word: Word;
-  intFilterInput: IntFilterInput;
-  listPlayersInput: ListPlayersInput;
-  listRoomsInput: ListRoomsInput;
-  stringFilterInput: StringFilterInput;
+  Ship: Ship;
+  ShipConnection: ShipConnection;
+  ShipEdge: ShipEdge;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
@@ -352,110 +273,71 @@ export type MapDirectiveArgs = {
 
 export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type DefinitionTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['DefinitionTuple'] = ResolversParentTypes['DefinitionTuple']> = {
+export type FactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Faction'] = ResolversParentTypes['Faction']> = {
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  value: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  ships: Resolver<Maybe<ResolversTypes['ShipConnection']>, ParentType, ContextType, Partial<FactionShipsArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IntroduceShipPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['IntroduceShipPayload'] = ResolversParentTypes['IntroduceShipPayload']> = {
+  clientMutationId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  faction: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
+  ship: Resolver<Maybe<ResolversTypes['Ship']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  addPlayerToRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationAddPlayerToRoomArgs, 'roomid' | 'userid'>>;
-  createPlayer: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
-  createRoom: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<MutationCreateRoomArgs, 'tag'>>;
+  introduceShip: Resolver<Maybe<ResolversTypes['IntroduceShipPayload']>, ParentType, ContextType, RequireFields<MutationIntroduceShipArgs, 'input'>>;
+};
+
+export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
+  __resolveType: TypeResolveFn<'Faction' | 'Ship', ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
 };
 
 export type PageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
-  endCursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  endCursor: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   hasNextPage: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hasPreviousPage: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  startCursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type PlayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Player'] = ResolversParentTypes['Player']> = {
-  _id: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  color: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  overallScore: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type PlayerConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerConnection'] = ResolversParentTypes['PlayerConnection']> = {
-  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['PlayerEdge']>>>, ParentType, ContextType>;
-  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type PlayerEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerEdge'] = ResolversParentTypes['PlayerEdge']> = {
-  cursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  node: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
+  startCursor: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  getPlayerById: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType, RequireFields<QueryGetPlayerByIdArgs, 'id'>>;
-  getRoomById: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByIdArgs, 'id'>>;
-  getRoomByTag: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType, RequireFields<QueryGetRoomByTagArgs, 'tag'>>;
-  players: Resolver<Maybe<ResolversTypes['PlayerConnection']>, ParentType, ContextType, Partial<QueryPlayersArgs>>;
-  rooms: Resolver<Maybe<ResolversTypes['RoomConnection']>, ParentType, ContextType, Partial<QueryRoomsArgs>>;
+  empire: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
+  node: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
+  rebels: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
 };
 
-export type RoomResolvers<ContextType = any, ParentType extends ResolversParentTypes['Room'] = ResolversParentTypes['Room']> = {
-  _id: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  players: Resolver<Array<ResolversTypes['Player']>, ParentType, ContextType>;
-  scores: Resolver<Array<ResolversTypes['ScoreTuple']>, ParentType, ContextType>;
-  tag: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  words: Resolver<Array<ResolversTypes['Word']>, ParentType, ContextType>;
+export type ShipResolvers<ContextType = any, ParentType extends ResolversParentTypes['Ship'] = ResolversParentTypes['Ship']> = {
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type RoomConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['RoomConnection'] = ResolversParentTypes['RoomConnection']> = {
-  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['RoomEdge']>>>, ParentType, ContextType>;
+export type ShipConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShipConnection'] = ResolversParentTypes['ShipConnection']> = {
+  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['ShipEdge']>>>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type RoomEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['RoomEdge'] = ResolversParentTypes['RoomEdge']> = {
+export type ShipEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShipEdge'] = ResolversParentTypes['ShipEdge']> = {
   cursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  node: Resolver<Maybe<ResolversTypes['Room']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type ScoreTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScoreTuple'] = ResolversParentTypes['ScoreTuple']> = {
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  score: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type VoteTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['VoteTuple'] = ResolversParentTypes['VoteTuple']> = {
-  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  proposerid: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
-  authorid: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  definitions: Resolver<Array<ResolversTypes['DefinitionTuple']>, ParentType, ContextType>;
-  state: Resolver<ResolversTypes['WordState'], ParentType, ContextType>;
-  voters: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
-  votes: Resolver<Array<ResolversTypes['VoteTuple']>, ParentType, ContextType>;
+  node: Resolver<Maybe<ResolversTypes['Ship']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
-  DefinitionTuple: DefinitionTupleResolvers<ContextType>;
+  Faction: FactionResolvers<ContextType>;
+  IntroduceShipPayload: IntroduceShipPayloadResolvers<ContextType>;
   Mutation: MutationResolvers<ContextType>;
+  Node: NodeResolvers<ContextType>;
   PageInfo: PageInfoResolvers<ContextType>;
-  Player: PlayerResolvers<ContextType>;
-  PlayerConnection: PlayerConnectionResolvers<ContextType>;
-  PlayerEdge: PlayerEdgeResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
-  Room: RoomResolvers<ContextType>;
-  RoomConnection: RoomConnectionResolvers<ContextType>;
-  RoomEdge: RoomEdgeResolvers<ContextType>;
-  ScoreTuple: ScoreTupleResolvers<ContextType>;
-  VoteTuple: VoteTupleResolvers<ContextType>;
-  Word: WordResolvers<ContextType>;
+  Ship: ShipResolvers<ContextType>;
+  ShipConnection: ShipConnectionResolvers<ContextType>;
+  ShipEdge: ShipEdgeResolvers<ContextType>;
 };
 
 export type DirectiveResolvers<ContextType = any> = {
