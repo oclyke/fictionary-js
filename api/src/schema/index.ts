@@ -102,7 +102,7 @@ const PlayerType: GraphQLObjectType = new GraphQLObjectType({
       description: 'The players overall score.',
     },
     gameHistoryConnection: {
-      type: gameConnection,
+      type: GameConnection,
       description: 'Individual Games of fictionary.',
       args: connectionArgs,
       resolve: (meta, args) =>
@@ -137,7 +137,7 @@ const DefinitionType: GraphQLObjectType = new GraphQLObjectType({
       description: 'The definition of the word.',
     },
     contributorsConnection: {
-      type: playerConnection,
+      type: PlayerConnection,
       description: 'Connection to players who contributed the word to fictionary.',
       args: connectionArgs,
       resolve: (meta, args) =>
@@ -173,7 +173,7 @@ const DefinitionType: GraphQLObjectType = new GraphQLObjectType({
       description: 'The name of the game.',
     },
     playersConnection: {
-      type: playerConnection,
+      type: PlayerConnection,
       description: 'Connection to players who participated in the game.',
       args: connectionArgs,
       resolve: (game, args) =>
@@ -272,14 +272,14 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
       description: 'The description of fictionary.',
     },
     players: {
-      type: playerConnection,
+      type: PlayerConnection,
       description: 'The Players who have played fictionary.',
       args: connectionArgs,
       resolve: (meta, args) =>
         connectionFromArray(meta.players.map(getPlayer), args),
     },
     games: {
-      type: gameConnection,
+      type: GameConnection,
       description: 'Individual Games of fictionary.',
       args: connectionArgs,
       resolve: (meta, args) =>
@@ -401,7 +401,7 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
  *     node: Player
  *   }
  */
-const { connectionType: playerConnection } = connectionDefinitions({
+export const { connectionType: PlayerConnection } = connectionDefinitions({
   nodeType: PlayerType,
 });
 
@@ -421,7 +421,7 @@ const { connectionType: playerConnection } = connectionDefinitions({
  *     node: Game
  *   }
  */
-const { connectionType: gameConnection } = connectionDefinitions({
+const { connectionType: GameConnection } = connectionDefinitions({
   nodeType: GameType,
 });
 
