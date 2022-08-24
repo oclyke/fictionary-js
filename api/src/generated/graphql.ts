@@ -14,47 +14,92 @@ export type Scalars = {
   Float: number;
 };
 
-/** A faction in the Star Wars saga */
-export type Faction = Node & {
-  __typename?: 'Faction';
+/** Definition information. */
+export type DefinitionTuple = {
+  __typename?: 'DefinitionTuple';
+  /** The ID of the player whose definition is recorded in the tuple. */
+  id: Scalars['String'];
+  /** The definition associated with this ID. */
+  value: Scalars['String'];
+};
+
+/** Definition of a word. */
+export type Game = Node & {
+  __typename?: 'Game';
+  /** Date of game creation. */
+  created: Maybe<Scalars['String']>;
   /** The ID of an object */
   id: Scalars['ID'];
-  /** The name of the faction. */
+  /** The name of the game. */
   name: Maybe<Scalars['String']>;
-  /** The ships used by the faction. */
-  ships: Maybe<ShipConnection>;
+  /** Connection to players who participated in the game. */
+  playersConnection: Maybe<PlayerConnection>;
+  /** Words of the game. */
+  scores: Maybe<ScoreTuple>;
+  /** Date when game was last updated. */
+  updated: Maybe<Scalars['String']>;
+  /** Words of the game. */
+  words: Maybe<Word>;
 };
 
 
-/** A faction in the Star Wars saga */
-export type FactionShipsArgs = {
+/** Definition of a word. */
+export type GamePlayersConnectionArgs = {
   after: InputMaybe<Scalars['String']>;
   before: InputMaybe<Scalars['String']>;
   first: InputMaybe<Scalars['Int']>;
   last: InputMaybe<Scalars['Int']>;
 };
 
-export type IntroduceShipInput = {
-  clientMutationId: InputMaybe<Scalars['String']>;
-  factionId: Scalars['ID'];
-  shipName: Scalars['String'];
+/** A connection to a list of items. */
+export type GameConnection = {
+  __typename?: 'GameConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<Maybe<GameEdge>>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
 };
 
-export type IntroduceShipPayload = {
-  __typename?: 'IntroduceShipPayload';
-  clientMutationId: Maybe<Scalars['String']>;
-  faction: Maybe<Faction>;
-  ship: Maybe<Ship>;
+/** An edge in a connection. */
+export type GameEdge = {
+  __typename?: 'GameEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node: Maybe<Game>;
 };
 
-export type Mutation = {
-  __typename?: 'Mutation';
-  introduceShip: Maybe<IntroduceShipPayload>;
+/** Meta information about fictionary. */
+export type Meta = Node & {
+  __typename?: 'Meta';
+  /** The description of fictionary. */
+  description: Maybe<Scalars['String']>;
+  /** Individual Games of fictionary. */
+  games: Maybe<GameConnection>;
+  /** The ID of an object */
+  id: Scalars['ID'];
+  /** The name of fictionary. */
+  name: Maybe<Scalars['String']>;
+  /** The Players who have played fictionary. */
+  players: Maybe<PlayerConnection>;
 };
 
 
-export type MutationIntroduceShipArgs = {
-  input: IntroduceShipInput;
+/** Meta information about fictionary. */
+export type MetaGamesArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
+};
+
+
+/** Meta information about fictionary. */
+export type MetaPlayersArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
 };
 
 /** An object with an ID */
@@ -76,12 +121,58 @@ export type PageInfo = {
   startCursor: Maybe<Scalars['String']>;
 };
 
+/** Player information. */
+export type Player = Node & {
+  __typename?: 'Player';
+  /** The description of fictionary. */
+  color: Maybe<Scalars['String']>;
+  /** The description of fictionary. */
+  description: Maybe<Scalars['String']>;
+  /** Individual Games of fictionary. */
+  gameHistoryConnection: Maybe<GameConnection>;
+  /** The ID of an object */
+  id: Scalars['ID'];
+  /** The players name. */
+  name: Maybe<Scalars['String']>;
+  /** The players overall score. */
+  overallScore: Maybe<Scalars['Int']>;
+};
+
+
+/** Player information. */
+export type PlayerGameHistoryConnectionArgs = {
+  after: InputMaybe<Scalars['String']>;
+  before: InputMaybe<Scalars['String']>;
+  first: InputMaybe<Scalars['Int']>;
+  last: InputMaybe<Scalars['Int']>;
+};
+
+/** A connection to a list of items. */
+export type PlayerConnection = {
+  __typename?: 'PlayerConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<Maybe<PlayerEdge>>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type PlayerEdge = {
+  __typename?: 'PlayerEdge';
+  /** A cursor for use in pagination */
+  cursor: Scalars['String'];
+  /** The item at the end of the edge */
+  node: Maybe<Player>;
+};
+
 export type Query = {
   __typename?: 'Query';
-  empire: Maybe<Faction>;
+  gameById: Maybe<Game>;
+  gameByTag: Maybe<Game>;
+  meta: Maybe<Meta>;
   /** Fetches an object given its ID */
   node: Maybe<Node>;
-  rebels: Maybe<Faction>;
+  player: Maybe<Player>;
 };
 
 
@@ -89,31 +180,49 @@ export type QueryNodeArgs = {
   id: Scalars['ID'];
 };
 
-/** A ship in the Star Wars saga */
-export type Ship = Node & {
-  __typename?: 'Ship';
-  /** The ID of an object */
-  id: Scalars['ID'];
-  /** The name of the ship. */
-  name: Maybe<Scalars['String']>;
+/** Scoring information. */
+export type ScoreTuple = {
+  __typename?: 'ScoreTuple';
+  /** The ID of the player whose score is recorded in the tuple. */
+  id: Scalars['String'];
+  /** The score associated with this ID. */
+  score: Scalars['Int'];
 };
 
-/** A connection to a list of items. */
-export type ShipConnection = {
-  __typename?: 'ShipConnection';
-  /** A list of edges. */
-  edges: Maybe<Array<Maybe<ShipEdge>>>;
-  /** Information to aid in pagination. */
-  pageInfo: PageInfo;
+/** Vote information. */
+export enum VoteTuple {
+  /** Word is closed and may be used to compute scores. */
+  Closed = 'CLOSED',
+  /** Word is open for definition proposal. */
+  Open = 'OPEN',
+  /** Word is closed for definition proposal and is in voting period. */
+  Voting = 'VOTING'
+}
+
+/** In-game Word information. */
+export type Word = {
+  __typename?: 'Word';
+  /** The ID of the author of the Word. */
+  authorid: Scalars['String'];
+  /** Proposed definitions of the word. */
+  definitions: Array<DefinitionTuple>;
+  /** The Word state. */
+  state: WordState;
+  /** the  */
+  value: Scalars['String'];
+  /** IDs of players who are allowed to vote on this Word. */
+  voters: Array<Scalars['String']>;
+  /** Votes cast for various definitions by eligible players. */
+  votes: Array<VoteTuple>;
 };
 
-/** An edge in a connection. */
-export type ShipEdge = {
-  __typename?: 'ShipEdge';
-  /** A cursor for use in pagination */
-  cursor: Scalars['String'];
-  /** The item at the end of the edge */
-  node: Maybe<Ship>;
+/** Word state information. */
+export type WordState = {
+  __typename?: 'WordState';
+  /** The ID of the player whose vote is recorded in the tuple. */
+  id: Scalars['String'];
+  /** The id of the proposer whose definition is voted for. */
+  proposerId: Scalars['String'];
 };
 
 export type AdditionalEntityFields = {
@@ -190,39 +299,48 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Faction: ResolverTypeWrapper<Faction>;
-  ID: ResolverTypeWrapper<Scalars['ID']>;
+  DefinitionTuple: ResolverTypeWrapper<DefinitionTuple>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Game: ResolverTypeWrapper<Game>;
+  ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  IntroduceShipInput: IntroduceShipInput;
-  IntroduceShipPayload: ResolverTypeWrapper<IntroduceShipPayload>;
-  Mutation: ResolverTypeWrapper<{}>;
-  Node: ResolversTypes['Faction'] | ResolversTypes['Ship'];
+  GameConnection: ResolverTypeWrapper<GameConnection>;
+  GameEdge: ResolverTypeWrapper<GameEdge>;
+  Meta: ResolverTypeWrapper<Meta>;
+  Node: ResolversTypes['Game'] | ResolversTypes['Meta'] | ResolversTypes['Player'];
   PageInfo: ResolverTypeWrapper<PageInfo>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Player: ResolverTypeWrapper<Player>;
+  PlayerConnection: ResolverTypeWrapper<PlayerConnection>;
+  PlayerEdge: ResolverTypeWrapper<PlayerEdge>;
   Query: ResolverTypeWrapper<{}>;
-  Ship: ResolverTypeWrapper<Ship>;
-  ShipConnection: ResolverTypeWrapper<ShipConnection>;
-  ShipEdge: ResolverTypeWrapper<ShipEdge>;
+  ScoreTuple: ResolverTypeWrapper<ScoreTuple>;
+  VoteTuple: VoteTuple;
+  Word: ResolverTypeWrapper<Word>;
+  WordState: ResolverTypeWrapper<WordState>;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Faction: Faction;
-  ID: Scalars['ID'];
+  DefinitionTuple: DefinitionTuple;
   String: Scalars['String'];
+  Game: Game;
+  ID: Scalars['ID'];
   Int: Scalars['Int'];
-  IntroduceShipInput: IntroduceShipInput;
-  IntroduceShipPayload: IntroduceShipPayload;
-  Mutation: {};
-  Node: ResolversParentTypes['Faction'] | ResolversParentTypes['Ship'];
+  GameConnection: GameConnection;
+  GameEdge: GameEdge;
+  Meta: Meta;
+  Node: ResolversParentTypes['Game'] | ResolversParentTypes['Meta'] | ResolversParentTypes['Player'];
   PageInfo: PageInfo;
   Boolean: Scalars['Boolean'];
+  Player: Player;
+  PlayerConnection: PlayerConnection;
+  PlayerEdge: PlayerEdge;
   Query: {};
-  Ship: Ship;
-  ShipConnection: ShipConnection;
-  ShipEdge: ShipEdge;
+  ScoreTuple: ScoreTuple;
+  Word: Word;
+  WordState: WordState;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
@@ -273,26 +391,46 @@ export type MapDirectiveArgs = {
 
 export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
-export type FactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Faction'] = ResolversParentTypes['Faction']> = {
+export type DefinitionTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['DefinitionTuple'] = ResolversParentTypes['DefinitionTuple']> = {
+  id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GameResolvers<ContextType = any, ParentType extends ResolversParentTypes['Game'] = ResolversParentTypes['Game']> = {
+  created: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  ships: Resolver<Maybe<ResolversTypes['ShipConnection']>, ParentType, ContextType, Partial<FactionShipsArgs>>;
+  playersConnection: Resolver<Maybe<ResolversTypes['PlayerConnection']>, ParentType, ContextType, Partial<GamePlayersConnectionArgs>>;
+  scores: Resolver<Maybe<ResolversTypes['ScoreTuple']>, ParentType, ContextType>;
+  updated: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  words: Resolver<Maybe<ResolversTypes['Word']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type IntroduceShipPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['IntroduceShipPayload'] = ResolversParentTypes['IntroduceShipPayload']> = {
-  clientMutationId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  faction: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
-  ship: Resolver<Maybe<ResolversTypes['Ship']>, ParentType, ContextType>;
+export type GameConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['GameConnection'] = ResolversParentTypes['GameConnection']> = {
+  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['GameEdge']>>>, ParentType, ContextType>;
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  introduceShip: Resolver<Maybe<ResolversTypes['IntroduceShipPayload']>, ParentType, ContextType, RequireFields<MutationIntroduceShipArgs, 'input'>>;
+export type GameEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['GameEdge'] = ResolversParentTypes['GameEdge']> = {
+  cursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MetaResolvers<ContextType = any, ParentType extends ResolversParentTypes['Meta'] = ResolversParentTypes['Meta']> = {
+  description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  games: Resolver<Maybe<ResolversTypes['GameConnection']>, ParentType, ContextType, Partial<MetaGamesArgs>>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  players: Resolver<Maybe<ResolversTypes['PlayerConnection']>, ParentType, ContextType, Partial<MetaPlayersArgs>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type NodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
-  __resolveType: TypeResolveFn<'Faction' | 'Ship', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Game' | 'Meta' | 'Player', ParentType, ContextType>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
 };
 
@@ -304,40 +442,73 @@ export type PageInfoResolvers<ContextType = any, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  empire: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
-  node: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
-  rebels: Resolver<Maybe<ResolversTypes['Faction']>, ParentType, ContextType>;
-};
-
-export type ShipResolvers<ContextType = any, ParentType extends ResolversParentTypes['Ship'] = ResolversParentTypes['Ship']> = {
+export type PlayerResolvers<ContextType = any, ParentType extends ResolversParentTypes['Player'] = ResolversParentTypes['Player']> = {
+  color: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  gameHistoryConnection: Resolver<Maybe<ResolversTypes['GameConnection']>, ParentType, ContextType, Partial<PlayerGameHistoryConnectionArgs>>;
   id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  overallScore: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ShipConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShipConnection'] = ResolversParentTypes['ShipConnection']> = {
-  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['ShipEdge']>>>, ParentType, ContextType>;
+export type PlayerConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerConnection'] = ResolversParentTypes['PlayerConnection']> = {
+  edges: Resolver<Maybe<Array<Maybe<ResolversTypes['PlayerEdge']>>>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ShipEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShipEdge'] = ResolversParentTypes['ShipEdge']> = {
+export type PlayerEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PlayerEdge'] = ResolversParentTypes['PlayerEdge']> = {
   cursor: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  node: Resolver<Maybe<ResolversTypes['Ship']>, ParentType, ContextType>;
+  node: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  gameById: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
+  gameByTag: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
+  meta: Resolver<Maybe<ResolversTypes['Meta']>, ParentType, ContextType>;
+  node: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
+  player: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
+};
+
+export type ScoreTupleResolvers<ContextType = any, ParentType extends ResolversParentTypes['ScoreTuple'] = ResolversParentTypes['ScoreTuple']> = {
+  id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  score: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type WordResolvers<ContextType = any, ParentType extends ResolversParentTypes['Word'] = ResolversParentTypes['Word']> = {
+  authorid: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  definitions: Resolver<Array<ResolversTypes['DefinitionTuple']>, ParentType, ContextType>;
+  state: Resolver<ResolversTypes['WordState'], ParentType, ContextType>;
+  value: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  voters: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
+  votes: Resolver<Array<ResolversTypes['VoteTuple']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type WordStateResolvers<ContextType = any, ParentType extends ResolversParentTypes['WordState'] = ResolversParentTypes['WordState']> = {
+  id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  proposerId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
-  Faction: FactionResolvers<ContextType>;
-  IntroduceShipPayload: IntroduceShipPayloadResolvers<ContextType>;
-  Mutation: MutationResolvers<ContextType>;
+  DefinitionTuple: DefinitionTupleResolvers<ContextType>;
+  Game: GameResolvers<ContextType>;
+  GameConnection: GameConnectionResolvers<ContextType>;
+  GameEdge: GameEdgeResolvers<ContextType>;
+  Meta: MetaResolvers<ContextType>;
   Node: NodeResolvers<ContextType>;
   PageInfo: PageInfoResolvers<ContextType>;
+  Player: PlayerResolvers<ContextType>;
+  PlayerConnection: PlayerConnectionResolvers<ContextType>;
+  PlayerEdge: PlayerEdgeResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
-  Ship: ShipResolvers<ContextType>;
-  ShipConnection: ShipConnectionResolvers<ContextType>;
-  ShipEdge: ShipEdgeResolvers<ContextType>;
+  ScoreTuple: ScoreTupleResolvers<ContextType>;
+  Word: WordResolvers<ContextType>;
+  WordState: WordStateResolvers<ContextType>;
 };
 
 export type DirectiveResolvers<ContextType = any> = {
