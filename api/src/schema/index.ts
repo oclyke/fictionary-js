@@ -32,6 +32,7 @@ import {
 
 import {
   getGame,
+  createGame,
 } from './game'
 
 /**
@@ -89,10 +90,6 @@ const PlayerType: GraphQLObjectType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The players name.',
     },
-    description: {
-      type: GraphQLString,
-      description: 'The description of fictionary.',
-    },
     color: {
       type: GraphQLString,
       description: 'The description of fictionary.',
@@ -101,7 +98,22 @@ const PlayerType: GraphQLObjectType = new GraphQLObjectType({
       type: GraphQLInt,
       description: 'The players overall score.',
     },
-    gameHistoryConnection: {
+    // note: so far it has been impossible to keep a direct connection
+    // straight to previous game types, due to the inclusion of a circular
+    // dependency Player.games.edges.nodes.Game.players.Player.games 
+    // and so on...
+    // some folk say that TypeScript can support circular type dependencies:
+    // https://stackoverflow.com/questions/36966444/how-to-create-a-circularly-referenced-type-in-typescript
+    // https://github.com/Microsoft/TypeScript/issues/3496
+    // 
+    // hmmm... is this the fix??
+    // https://github.com/graphql/graphql-spec/issues/91
+    //
+    // or perhaps the solution was in fact to break the circular dependency as it pertained between
+    // the model and the view:
+    // https://www.graphql-code-generator.com/plugins/typescript/typescript-resolvers
+    // https://youtu.be/tHMaNmqPIC4
+    games: {
       type: GameConnection,
       description: 'Individual Games of fictionary.',
       args: connectionArgs,
@@ -172,7 +184,7 @@ const DefinitionType: GraphQLObjectType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The name of the game.',
     },
-    playersConnection: {
+    players: {
       type: PlayerConnection,
       description: 'Connection to players who participated in the game.',
       args: connectionArgs,
@@ -180,13 +192,13 @@ const DefinitionType: GraphQLObjectType = new GraphQLObjectType({
         connectionFromArray(game.players.map(getPlayer), args),
     },
     words: {
-      type: WordType,
+      type: new GraphQLList(WordType),
       description: 'Words of the game.',
       resolve: (game, args) =>
         connectionFromArray(game.words, args),
     },
     scores: {
-      type: ScoreTupleType,
+      type: new GraphQLList(ScoreTupleType),
       description: 'Words of the game.',
       resolve: (game, args) =>
         connectionFromArray(game.words, args),
@@ -337,7 +349,7 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 /**
- * Define the DefinitionTuple type.
+ * Define the WordState type.
  *
  * This implements the following type system shorthand:
  * type VoteTuple {
@@ -345,8 +357,8 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
  *   proposerId: ID! # id of proposer to which the vote goes
  * }
  */
- const VoteTupleType: GraphQLEnumType = new GraphQLEnumType({
-  name: 'VoteTuple',
+ const WordStateType: GraphQLEnumType = new GraphQLEnumType({
+  name: 'WordState',
   description: 'Vote information.',
   values: {
     OPEN: {
@@ -362,7 +374,7 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
 });
 
 /**
- * Define the WordState type.
+ * Define the DefinitionTuple type.
  *
  * This implements the following type system shorthand:
  * type VoteTuple {
@@ -370,8 +382,8 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
  *   proposerId: ID! # id of proposer to which the vote goes
  * }
  */
- const WordStateType: GraphQLObjectType = new GraphQLObjectType({
-  name: 'WordState',
+ const VoteTupleType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'VoteTuple',
   description: 'Word state information.',
   fields: () => ({
     id: {
@@ -461,6 +473,41 @@ const { connectionType: GameConnection } = connectionDefinitions({
   }),
 });
 
+/**
+ * This will return a GraphQLFieldConfig for our createGame
+ * mutation.
+ *
+ * It creates these two types implicitly:
+ *   input CreateGameInput {
+ *     clientMutationId: string
+ *     name: string!
+ *   }
+ *
+ *   type CreateGamePayload {
+ *     clientMutationId: string
+ *     game: Game
+ *   }
+ */
+const createGameMutation = mutationWithClientMutationId({
+  name: 'CreateGame',
+  inputFields: {
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+  },
+  outputFields: {
+    game: {
+      type: GameType,
+      resolve: (payload) => getGame(payload.gameid),
+    },
+  },
+  mutateAndGetPayload: ({ name }) => {
+    const newGame = createGame(name);
+    return {
+      gameid: newGame.id,
+    };
+  },
+});
 
 
 /**
@@ -469,14 +516,14 @@ const { connectionType: GameConnection } = connectionDefinitions({
  *
  * This implements the following type system shorthand:
  * type Mutation {
- *   createRoom(tag: String!): Room
+ *   createGame(tag: String!): Game
  *   createPlayer: Player
  * }
  */
  const mutationType = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    // introduceShip: shipMutation,
+    createGame: createGameMutation,
   }),
 });
 
@@ -487,5 +534,5 @@ const { connectionType: GameConnection } = connectionDefinitions({
  */
 export const schema: GraphQLSchema = new GraphQLSchema({
   query: queryType,
-  // mutation: mutationType,
+  mutation: mutationType,
 });

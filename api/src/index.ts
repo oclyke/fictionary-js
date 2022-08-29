@@ -24,13 +24,17 @@ import {
   getDatabase,
 } from '../../backend/src/utils';
 
-import {
-  get_schema,
-} from './utils';
+// import {
+//   get_schema,
+// } from './utils';
 
 import {
   resolvers,
 } from './resolvers';
+
+import {
+  schema,
+} from './schema'
 
 import {
   start_wss
@@ -83,10 +87,12 @@ const run = async () => {
   }
   console.log(`session websocket server listening on wss://localhost:${SESSION_PORT}`);
 
+  console.warn('ARE YOU USING YOUR RESOLVERS? THAT MIGHT BE CONFUSING YOU... if resolvers is commented out then you might be relying on resolvers defined in code... (schema/index.ts)')
+
   // graphql server
   const server = new ApolloServer({
     persistedQueries: false,
-    typeDefs: get_schema(),
+    typeDefs: schema,
     resolvers,
     context: ({ req }) => {
       const token = req.headers.authorization || '';

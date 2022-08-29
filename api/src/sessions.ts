@@ -8,8 +8,8 @@ import {
 } from 'mongodb';
 
 import {
-  deleteRoom,
-} from '../../backend/src/room';
+  deleteGame,
+} from '../../backend/src/game';
 
 import {
   db,
@@ -52,7 +52,7 @@ const unregister = async (ws: ExtendedWebSocket) => {
           throw new Error('cannot remove session with undefined tag');
         }
 
-        await deleteRoom(db, new ObjectId(ws.roomid))
+        await deleteGame(db, new ObjectId(ws.roomid))
       }
     } else {
       console.error('could not find the client in the list!');

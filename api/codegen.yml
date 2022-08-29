@@ -9,6 +9,8 @@ generates:
       - "typescript-mongodb"
     config:
       avoidOptionals: true
+      # mappers:
+      #   Player: ../backend/src/user#UserModel
   src/generated/graphql.schema.json:
     plugins:
       - "introspection"

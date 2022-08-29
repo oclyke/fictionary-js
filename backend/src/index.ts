@@ -3,17 +3,14 @@ import {
 } from 'mongodb'
 
 import {
-  User,
+  UserModel,
 } from './user'
 
 import {
-  Room,
-} from './room'
-
-export type DBRoom = Omit<Room, '_id'>
-export type DBUser = Omit<User, '_id'>
+  GameModel,
+} from './game'
 
 export interface Database {
-  rooms: Collection<DBRoom>
-  users: Collection<DBUser>
+  games: Collection<GameModel>
+  users: Collection<UserModel>
 }

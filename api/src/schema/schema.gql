@@ -7,12 +7,8 @@ type Query {
 }
 
 type Mutation {
-  createRoom(tag: String!): Room
+  createGame(name: String!): Game
   createPlayer: Player
-}
-
-interface Node {
-  id: ID!
 }
 
 # the Meta node lists information about
@@ -20,7 +16,7 @@ interface Node {
 type Meta : Node {
   id: ID!
   name: String
-  games(input: listRoomsInput, first: Int, last: Int, after: String, before: String): GameConnection
+  games(input: listGamesInput, first: Int, last: Int, after: String, before: String): GameConnection
   players(input: listPlayersInput, first: Int, last: Int, after: String, before: String): PlayerConnection
 }
 
@@ -39,7 +35,7 @@ type Player : Node {
   name: String
   color: String
   overallScore: Int
-  gamesHistoryConnection: GameConnection
+  games: GameConnection
 }
 
 # a Game is a record of interactions between
@@ -114,4 +110,9 @@ type PageInfo {
   hasPreviousPage: Boolean!
   startCursor: String
   endCursor: String
+}
+
+### Node base
+interface Node {
+  id: ID!
 }

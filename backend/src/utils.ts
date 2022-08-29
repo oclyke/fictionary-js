@@ -72,7 +72,7 @@ async function startServer() {
 
 function getDatabase(client: MongoClient) {
   const db: Database = {
-    rooms: client.db(DBNAME).collection('rooms'),
+    games: client.db(DBNAME).collection('games'),
     users: client.db(DBNAME).collection('users'),
   };
   return db;
@@ -80,7 +80,7 @@ function getDatabase(client: MongoClient) {
 
 async function initializeDatabase(db: Database) {
   // this is to be called on brand-new databases
-  const result = await db.rooms.createIndex({tag: 'text'}, {unique: true});
+  const result = await db.games.createIndex({tag: 'text'}, {unique: true});
 }
 
 function shuffle<T>(array: Array<T>) {
