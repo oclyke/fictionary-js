@@ -10,7 +10,7 @@ import {
   Resolvers,
   Maybe,
   Game,
-} from './generated/graphql'
+} from './generated/schema/types'
 
 import {
   createGame,
@@ -23,6 +23,10 @@ import {
 import {
   getGame,
 } from './schema/game'
+
+import {
+  getMeta,
+} from './schema/meta'
 
 export const resolvers: Resolvers = {
   Query: {
@@ -38,7 +42,7 @@ export const resolvers: Resolvers = {
       return null
     },
     [`meta`]: async (parent, args) => {
-      return null
+      return getMeta('naught')
     },
     [`node`]: async (parent, args) => {
       return null

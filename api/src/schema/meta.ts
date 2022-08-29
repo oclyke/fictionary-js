@@ -1,6 +1,8 @@
 import {
   Meta,
-} from '../generated/graphql'
+} from '../generated/schema/types'
+
+// type Meta = any
 
 // the Meta type holds information about fictionary
 // it is not involved in normal gameplay
@@ -10,7 +12,13 @@ const meta: Meta = {
   id: 'naught',
   name: 'fictionary',
   description: 'a game of camouflage, misdirection, and astonishment in which players guess the true definition of obscure words',
-  players: null,
+  players: {
+    edges: [],
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+    }
+  },
   games: null,
 }
 

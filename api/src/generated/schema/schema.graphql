@@ -1,26 +1,14 @@
-"""Exposes a URL that specifies the behavior of this scalar."""
-directive @specifiedBy(
-  """The URL that specifies the behavior of this scalar."""
-  url: String!
-) on SCALAR
+type Query {
+  gameById: Game
+  gameByTag: Game
+  player: Player
+  meta: Meta
 
-input CreateGameInput {
-  name: String!
-  clientMutationId: String
-}
-
-type CreateGamePayload {
-  game: Game
-  clientMutationId: String
-}
-
-"""Definition information."""
-type DefinitionTuple {
-  """The ID of the player whose definition is recorded in the tuple."""
-  id: String!
-
-  """The definition associated with this ID."""
-  value: String!
+  """Fetches an object given its ID"""
+  node(
+    """The ID of an object"""
+    id: ID!
+  ): Node
 }
 
 """Definition of a word."""
@@ -59,6 +47,75 @@ type Game implements Node {
   updated: String
 }
 
+"""An object with an ID"""
+interface Node {
+  """The id of the object."""
+  id: ID!
+}
+
+"""A connection to a list of items."""
+type PlayerConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [PlayerEdge]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type PlayerEdge {
+  """The item at the end of the edge"""
+  node: Player
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Player information."""
+type Player implements Node {
+  """The ID of an object"""
+  id: ID!
+
+  """The players name."""
+  name: String
+
+  """The description of fictionary."""
+  color: String
+
+  """The players overall score."""
+  overallScore: Int
+
+  """Individual Games of fictionary."""
+  games(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): GameConnection
+}
+
 """A connection to a list of items."""
 type GameConnection {
   """Information to aid in pagination."""
@@ -75,6 +132,66 @@ type GameEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""In-game Word information."""
+type Word {
+  """the """
+  value: String!
+
+  """The ID of the author of the Word."""
+  authorid: String!
+
+  """IDs of players who are allowed to vote on this Word."""
+  voters: [String!]!
+
+  """Proposed definitions of the word."""
+  definitions: [DefinitionTuple!]!
+
+  """Votes cast for various definitions by eligible players."""
+  votes: [VoteTuple!]!
+
+  """The Word state."""
+  state: WordState!
+}
+
+"""Definition information."""
+type DefinitionTuple {
+  """The ID of the player whose definition is recorded in the tuple."""
+  id: String!
+
+  """The definition associated with this ID."""
+  value: String!
+}
+
+"""Word state information."""
+type VoteTuple {
+  """The ID of the player whose vote is recorded in the tuple."""
+  id: String!
+
+  """The id of the proposer whose definition is voted for."""
+  proposerId: String!
+}
+
+"""Vote information."""
+enum WordState {
+  """Word is open for definition proposal."""
+  OPEN
+
+  """Word is closed for definition proposal and is in voting period."""
+  VOTING
+
+  """Word is closed and may be used to compute scores."""
+  CLOSED
+}
+
+"""Scoring information."""
+type ScoreTuple {
+  """The ID of the player whose score is recorded in the tuple."""
+  id: String!
+
+  """The score associated with this ID."""
+  score: Int!
 }
 
 """Meta information about fictionary."""
@@ -123,136 +240,12 @@ type Mutation {
   createGame(input: CreateGameInput!): CreateGamePayload
 }
 
-"""An object with an ID"""
-interface Node {
-  """The id of the object."""
-  id: ID!
+type CreateGamePayload {
+  game: Game
+  clientMutationId: String
 }
 
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: String
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: String
+input CreateGameInput {
+  name: String!
+  clientMutationId: String
 }
-
-"""Player information."""
-type Player implements Node {
-  """The ID of an object"""
-  id: ID!
-
-  """The players name."""
-  name: String
-
-  """The description of fictionary."""
-  color: String
-
-  """The players overall score."""
-  overallScore: Int
-
-  """Individual Games of fictionary."""
-  games(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): GameConnection
-}
-
-"""A connection to a list of items."""
-type PlayerConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [PlayerEdge]
-}
-
-"""An edge in a connection."""
-type PlayerEdge {
-  """The item at the end of the edge"""
-  node: Player
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-type Query {
-  gameById: Game
-  gameByTag: Game
-  player: Player
-  meta: Meta
-
-  """Fetches an object given its ID"""
-  node(
-    """The ID of an object"""
-    id: ID!
-  ): Node
-}
-
-"""Scoring information."""
-type ScoreTuple {
-  """The ID of the player whose score is recorded in the tuple."""
-  id: String!
-
-  """The score associated with this ID."""
-  score: Int!
-}
-
-"""Word state information."""
-type VoteTuple {
-  """The ID of the player whose vote is recorded in the tuple."""
-  id: String!
-
-  """The id of the proposer whose definition is voted for."""
-  proposerId: String!
-}
-
-"""In-game Word information."""
-type Word {
-  """the """
-  value: String!
-
-  """The ID of the author of the Word."""
-  authorid: String!
-
-  """IDs of players who are allowed to vote on this Word."""
-  voters: [String!]!
-
-  """Proposed definitions of the word."""
-  definitions: [DefinitionTuple!]!
-
-  """Votes cast for various definitions by eligible players."""
-  votes: [VoteTuple!]!
-
-  """The Word state."""
-  state: WordState!
-}
-
-"""Vote information."""
-enum WordState {
-  """Word is open for definition proposal."""
-  OPEN
-
-  """Word is closed for definition proposal and is in voting period."""
-  VOTING
-
-  """Word is closed and may be used to compute scores."""
-  CLOSED
-}
-

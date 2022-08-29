@@ -1,6 +1,6 @@
-import {
-  ApolloServer,
-} from 'apollo-server';
+import * as express from 'express'
+import * as playground from 'graphql-playground-middleware-express'
+import * as expressGraphQL from 'express-graphql'
 
 import {
   WebSocketServer,
@@ -24,14 +24,6 @@ import {
   getDatabase,
 } from '../../backend/src/utils';
 
-// import {
-//   get_schema,
-// } from './utils';
-
-import {
-  resolvers,
-} from './resolvers';
-
 import {
   schema,
 } from './schema'
@@ -40,10 +32,18 @@ import {
   start_wss
 } from './sessions';
 
+// let's drop Apollo - they seem a little too hand-holdy for me
+// (but thanks Apollo - I did start graphql learning with your tutorials after all)
+// instead, let's try this stack:
+// https://medium.com/swlh/building-a-relay-compliant-schema-with-node-express-7064085f3cc4
+
 export let db: Database;
 export let wss: WebSocketServer;
 
 const DEFAULT_SESSION_PORT = 8042;
+const DEFAULT_API_PORT = 4000;
+const DEFAULT_API_EXPLORER_PATH = '/gql'
+const DEFAULT_API_ENDPOINT_PATH = '/graphql'
 
 function session_using_ssl() {
   return (typeof process.env.SESSION_BYPASS_SSL !== 'undefined') ? false : true;
@@ -87,20 +87,21 @@ const run = async () => {
   }
   console.log(`session websocket server listening on wss://localhost:${SESSION_PORT}`);
 
-  console.warn('ARE YOU USING YOUR RESOLVERS? THAT MIGHT BE CONFUSING YOU... if resolvers is commented out then you might be relying on resolvers defined in code... (schema/index.ts)')
-
   // graphql server
-  const server = new ApolloServer({
-    persistedQueries: false,
-    typeDefs: schema,
-    resolvers,
-    context: ({ req }) => {
-      const token = req.headers.authorization || '';
-      return { token };
-    },
-  });
-  const server_info = await server.listen();
-  console.log(`listening on ${server_info.url}`)
+  const api_server = express();
+  api_server.get(DEFAULT_API_EXPLORER_PATH, playground.default({ endpoint: '/graphql' }))
+  api_server.use(
+    DEFAULT_API_ENDPOINT_PATH,
+    expressGraphQL.graphqlHTTP({
+      schema,
+      graphiql: false,
+    }),
+  )
+  api_server.listen(DEFAULT_API_PORT, () => {
+    console.log(`API server (graphql) listening on ${DEFAULT_API_PORT}`)
+    console.log(`explorer: http://localhost:${DEFAULT_API_PORT}${DEFAULT_API_EXPLORER_PATH}`)
+    console.log(`endpoint: http://localhost:${DEFAULT_API_PORT}/graphql`)
+  })
 };
 
 run();

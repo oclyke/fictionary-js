@@ -1,8 +1,10 @@
-import type {
-  Game,
-  Word,
-  PlayerConnection,
-} from '../generated/graphql'
+// import type {
+//   Game,
+//   Word,
+//   PlayerConnection,
+// } from '../generated/graphql'
+
+type Game = any
 
 // meta is hardcoded right now
 import { getMeta } from './meta'

@@ -1,4 +1,5 @@
 import {
+  graphql,
   graphqlSync,
 } from 'graphql'
 
@@ -23,44 +24,16 @@ beforeEach(async () => {
 })
 
 
-test('empire', async () => {
-
-  // const source = `
-  // {
-  //   empire {
-  //     name
-  //     ships {
-  //       edges {
-  //         node {
-  //           name
-  //           id
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-  // `
-  // const result: any = graphqlSync({ schema, source })
-  // console.log(result.data.empire.ships.edges.map((s: any) => s.node))
-  // console.log('PARTY')
-
-  expect(false).toBeTruthy()
-
-  // await expect(get_user(db, new ObjectId('000000000000000000000000'))).resolves.toBeNull();
-})
-
-
-test('meta object', async () => {
-  // const source = `
-  // {
-  //   meta {
-  //     id
-  //     name
-  //   }
-  // }
-  // `
-  // const result: any = graphqlSync({ schema, source })
-  // console.log(result)
-
-  expect(false).toBeTruthy()
+test('meta', async () => {
+  const source = `
+  query {
+    meta {
+      name
+      description
+    }
+  }
+  `
+  const { data: { meta: { description, name} } }: any = await graphql({ schema, source })
+  expect(name).toBe('fictionary')
+  expect(description).toBe('a game of camouflage, misdirection, and astonishment in which players guess the true definition of obscure words')
 })

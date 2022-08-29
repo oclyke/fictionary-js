@@ -1,24 +1,50 @@
+import * as path from 'node:path'
+import * as fs from 'fs'
+
 import {
-  ApolloServer,
-} from 'apollo-server'
+  printSchema,
+} from 'graphql'
+
+import {
+  generate,
+} from '@graphql-codegen/cli'
 
 import {
   schema,
 } from './src/schema'
 
+const OUTPUT_DIR = path.join(__dirname, 'src/generated/schema')
+
 async function run () {
-  const server = new ApolloServer({
-    persistedQueries: false,
-    typeDefs: schema,
-    // resolvers,
-    context: ({ req }) => {
-      const token = req.headers.authorization || '';
-      return { token };
-    },
-  });
-  const server_info = await server.listen({
-    port: 4001
-  });
-  console.log(`listening on ${server_info.url}`)
+  console.log('node is running version: ', process.version)
+  
+  // prepare the schema in SDL format
+  const schemaSDLPath = path.join(OUTPUT_DIR, 'schema.graphql')
+  const schemaSDL = printSchema(schema)
+
+  // save the raw SDL
+  fs.writeFileSync(schemaSDLPath, schemaSDL);
+
+  // use the schema SDL definition to generate types
+  const config = {
+    schema: schemaSDL,
+    // documents: './src/**/*.graphql',
+    generates: {
+      [path.join(OUTPUT_DIR, 'types.ts')]: {
+        plugins: [
+          'typescript',
+          'typescript-resolvers',
+          // 'typescript-mongodb',
+        ],
+        // config: {
+        //   avoidOptionals: true,
+        // }
+      }
+    }
+  }
+  const generatedFiles = await generate(config, true) // true option allows 'generate' to save the files to disk
+
+  // signal completion
+  console.log('codegen complete')
 }
 run()

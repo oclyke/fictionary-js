@@ -287,8 +287,9 @@ const MetaType: GraphQLObjectType = new GraphQLObjectType({
       type: PlayerConnection,
       description: 'The Players who have played fictionary.',
       args: connectionArgs,
-      resolve: (meta, args) =>
-        connectionFromArray(meta.players.map(getPlayer), args),
+      resolve: (meta, args) => {
+        return connectionFromArray(meta.players.map(getPlayer), args)
+      },
     },
     games: {
       type: GameConnection,
@@ -455,7 +456,7 @@ const { connectionType: GameConnection } = connectionDefinitions({
   fields: () => ({
     gameById: {
       type: GameType,
-      resolve: () => { console.warn('unimplemented'); return getGame('0') },
+      resolve: (parent, args, context, info) => { console.warn('unimplemented'); return getGame('0') },
     },
     gameByTag: {
       type: GameType,
@@ -463,11 +464,21 @@ const { connectionType: GameConnection } = connectionDefinitions({
     },
     player: {
       type: PlayerType,
-      resolve: () => { console.warn('unimplemented'); return getPlayer('0') },
+      resolve: (parent, args, context, info) => {
+
+        console.log('trying to get player!')
+        console.log({parent, args, info})
+
+
+        return getPlayer('0')
+      },
     },
     meta: {
       type: MetaType,
-      resolve: () => { console.warn('unimplemented'); return getMeta('naught') },
+      resolve: (parent, args, context, info) => {
+        console.log({parent, args, info})
+        return getMeta('naught')
+      },
     },
     node: nodeField,
   }),
