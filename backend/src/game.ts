@@ -67,8 +67,8 @@ export async function deleteGame(db: Database, _id: ObjectId) {
   return await db.games.deleteOne({_id})
 }
 
-// export async function addPlayerToGame(db: Database, _id: ObjectId, userid: ObjectId) {
-//   const player = {...makeUser(), _id: userid.toString()}
-//   const {value} = await db.games.findOneAndUpdate({_id}, {$push: {players: player}}, {returnDocument: 'after'})
-//   return value
-// }
+export async function addPlayerToGame(db: Database, _id: ObjectId, userid: ObjectId) {
+  const player = {...makeUser(), _id: userid.toString()}
+  const {value} = await db.games.findOneAndUpdate({_id}, {$push: {players: player}}, {returnDocument: 'after'})
+  return value
+}

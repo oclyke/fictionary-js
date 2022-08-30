@@ -29,9 +29,9 @@ function makeUserObject(name: string): UserModel {
 }
 
 function get_random_name() {
-  const sentence = greg.sentence();
-  const tokens = sentence.split(' ');
-  return [tokens[1], tokens[2]].join('-');
+  const sentence = greg.sentence()
+  const tokens = sentence.split(' ')
+  return [tokens[1], tokens[2]].join('-')
 }
 
 export async function createUser(db: Database): Promise<WithId<UserModel>> {
@@ -52,11 +52,11 @@ export async function getUser(db: Database, _id: ObjectId) {
 }
 
 export async function setUserColor(db: Database, _id: ObjectId, color: string) {
-  const {value} = await db.users.findOneAndUpdate({_id}, {$set: {color}}, {returnDocument: 'after'})
-  return value
+  const { value: user } = await db.users.findOneAndUpdate({_id}, {$set: {color}}, {returnDocument: 'after'})
+  return user
 }
 
-// export async function user_set_tag(db: Database, _id: ObjectId, tag: string) {
-//   const {value} = await db.users.findOneAndUpdate({_id}, {$set: {tag}}, {returnDocument: 'after'})
-//   return value
-// }
+export async function setUserName(db: Database, _id: ObjectId, name: string) {
+  const { value: user } = await db.users.findOneAndUpdate({_id}, {$set: {name}}, {returnDocument: 'after'})
+  return user
+}
