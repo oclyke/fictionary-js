@@ -1,6 +1,7 @@
 import {
   ObjectId,
   OptionalId,
+  WithId,
 } from 'mongodb'
 
 // @ts-ignore
@@ -33,7 +34,7 @@ function get_random_name() {
   return [tokens[1], tokens[2]].join('-');
 }
 
-export async function createUser(db: Database) {
+export async function createUser(db: Database): Promise<WithId<UserModel>> {
   const user = makeUserObject(get_random_name())
   const { insertedId } = await db.users.insertOne(user)
   return {

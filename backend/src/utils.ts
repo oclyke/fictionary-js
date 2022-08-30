@@ -80,7 +80,7 @@ function getDatabase(client: MongoClient) {
 
 async function initializeDatabase(db: Database) {
   // this is to be called on brand-new databases
-  const result = await db.games.createIndex({tag: 'text'}, {unique: true});
+  const result = await db.games.createIndex({name: 'text'}, {unique: true});
 }
 
 function shuffle<T>(array: Array<T>) {

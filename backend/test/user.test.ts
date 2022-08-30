@@ -52,7 +52,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   // make sure each test starts with clean collections
-  await db.rooms.deleteMany({});
+  await db.games.deleteMany({});
   await db.users.deleteMany({});
 });
 

@@ -1,6 +1,7 @@
 import {
   ObjectId,
   OptionalId,
+  WithId,
 } from 'mongodb'
 
 import {
@@ -45,7 +46,7 @@ function makeGameObject(name: string): GameModel {
   }
 }
 
-export async function createGame(db: Database, name: string): Promise<GameModel> {
+export async function createGame(db: Database, name: string): Promise<WithId<GameModel>> {
   const game = makeGameObject(name)
   const { insertedId } = await db.games.insertOne(game)
   return {
@@ -58,8 +59,8 @@ export async function getGame(db: Database, _id: ObjectId) {
   return await db.games.findOne({_id})
 }
 
-export async function getGameByTag(db: Database, tag: string) {
-  return await db.games.findOne({tag})
+export async function getGameByName(db: Database, name: string) {
+  return await db.games.findOne({name})
 }
 
 export async function deleteGame(db: Database, _id: ObjectId) {
