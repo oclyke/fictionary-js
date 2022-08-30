@@ -15,7 +15,7 @@ export type UserModel = OptionalId<{
   name: string
   color: string
   overallScore: number
-  games: string[]
+  games: ObjectId[]
 }>
 
 function makeUserObject(name: string): UserModel {

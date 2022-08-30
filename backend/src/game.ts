@@ -10,23 +10,23 @@ import {
 
 export type GameModel = OptionalId<{
   name: string
-  players: string[]
+  players: ObjectId[]
   words: {
     value: string
-    author: string
-    voters: string[]
+    author: ObjectId
+    voters: ObjectId[]
     definitions: {
-      id: string
+      id: ObjectId
       value: string
     }[]
     votes: {
-      id: string
+      id: ObjectId
       proposerId: string
     }[]
     state: 'OPEN' | 'VOTING' | 'CLOSED'
   }[]
   scores: {
-    id: string
+    id: ObjectId
     score: number
   }[]
   created: string
@@ -44,6 +44,10 @@ function makeGameObject(name: string): GameModel {
     created: now,
     updated: now,
   }
+}
+
+export async function findGame(db: Database, filters?: {}) {
+  return db.games.find()
 }
 
 export async function createGame(db: Database, name: string): Promise<WithId<GameModel>> {
@@ -67,8 +71,7 @@ export async function deleteGame(db: Database, _id: ObjectId) {
   return await db.games.deleteOne({_id})
 }
 
-export async function addPlayerToGame(db: Database, _id: ObjectId, userid: ObjectId) {
-  const player = {...makeUser(), _id: userid.toString()}
-  const {value} = await db.games.findOneAndUpdate({_id}, {$push: {players: player}}, {returnDocument: 'after'})
-  return value
+export async function addPlayerToGame(db: Database, _id: ObjectId, playerid: ObjectId) {
+  const { value: game } = await db.games.findOneAndUpdate({_id}, {$push: {players: playerid}}, {returnDocument: 'after'})
+  return game
 }
