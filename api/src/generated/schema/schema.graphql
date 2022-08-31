@@ -1,6 +1,5 @@
 type Query {
-  gameById: Game
-  gameByTag: Game
+  game: Game
   player: Player
   meta: Meta
 

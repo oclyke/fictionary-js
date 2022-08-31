@@ -1,6 +1,7 @@
 {
   "watch": [
     "src",
+    "src/schema",
     "../backend/src"
   ],
   "ext": "ts, gql",

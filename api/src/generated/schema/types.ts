@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -186,8 +187,7 @@ export type PlayerEdge = {
 
 export type Query = {
   __typename?: 'Query';
-  gameById?: Maybe<Game>;
-  gameByTag?: Maybe<Game>;
+  game?: Maybe<Game>;
   meta?: Maybe<Meta>;
   /** Fetches an object given its ID */
   node?: Maybe<Node>;
@@ -445,8 +445,7 @@ export type PlayerEdgeResolvers<ContextType = any, ParentType extends ResolversP
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  gameById?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
-  gameByTag?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
+  game?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
   meta?: Resolver<Maybe<ResolversTypes['Meta']>, ParentType, ContextType>;
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
   player?: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
@@ -493,3 +492,19 @@ export type Resolvers<ContextType = any> = {
   Word?: WordResolvers<ContextType>;
 };
 
+
+export type GetGameQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string } | null };
+
+export type GameFieldsFragment = { __typename?: 'Game', id: string };
+
+export type GetMetaQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMetaQuery = { __typename?: 'Query', meta?: { __typename?: 'Meta', id: string, name?: string | null, description?: string | null } | null };
+
+export const GameFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"GameFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Game"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]} as unknown as DocumentNode<GameFieldsFragment, unknown>;
+export const GetGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"GameFields"}}]}}]}},...GameFieldsFragmentDoc.definitions]} as unknown as DocumentNode<GetGameQuery, GetGameQueryVariables>;
+export const GetMetaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getMeta"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"meta"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<GetMetaQuery, GetMetaQueryVariables>;

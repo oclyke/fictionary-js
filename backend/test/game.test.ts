@@ -8,13 +8,16 @@ import {
 } from 'mongodb'
 
 import {
+  startServer,
+} from './environment'
+
+import {
   Database,
 } from '../src'
 
 import {
   getDatabase,
   initializeDatabase,
-  startServer,
 } from '../src/utils'
 
 import {

@@ -1,0 +1,9 @@
+query getGame {
+  game {
+    ...GameFields
+  }
+}
+
+fragment GameFields on Game {
+  id
+}

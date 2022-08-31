@@ -10,7 +10,37 @@ import {
   GameModel,
 } from './game'
 
+import {
+  MetaModel,
+} from './meta'
+
 export interface Database {
   games: Collection<GameModel>
   users: Collection<UserModel>
+  meta: Collection<MetaModel>
 }
+
+export function objIsDatabase (obj: any): obj is Database {
+  let result = false
+  if (typeof obj === 'object') {
+    if ( true
+      && (typeof obj.games !== 'undefined')
+      && (typeof obj.users !== 'undefined')
+      && (typeof obj.meta !== 'undefined')
+    ) {
+      result = true
+    }
+  }
+  return result
+}
+
+export {
+  MetaModel,
+  GameModel,
+  UserModel,
+}
+
+export {
+  getDatabase,
+  initializeDatabase,
+} from './utils'

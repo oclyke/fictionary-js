@@ -16,11 +16,14 @@ import {
 } from 'fs';
 
 import {
+  getDbClient,
+} from './db'
+
+import {
   Database,
 } from '../../backend/src'
 
 import {
-  getDbClient,
   getDatabase,
 } from '../../backend/src/utils';
 
@@ -92,10 +95,13 @@ const run = async () => {
   api_server.get(DEFAULT_API_EXPLORER_PATH, playground.default({ endpoint: '/graphql' }))
   api_server.use(
     DEFAULT_API_ENDPOINT_PATH,
-    expressGraphQL.graphqlHTTP({
+    expressGraphQL.graphqlHTTP((req, res, graphQLParams) => ({
       schema,
       graphiql: false,
-    }),
+      context: {
+        db,
+      },
+    })),
   )
   api_server.listen(DEFAULT_API_PORT, () => {
     console.log(`API server (graphql) listening on ${DEFAULT_API_PORT}`)

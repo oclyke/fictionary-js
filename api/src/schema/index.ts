@@ -7,6 +7,7 @@ import {
   GraphQLInt,
   GraphQLEnumType,
   GraphQLList,
+  GraphQLFieldResolver,
 } from 'graphql'
 
 import {
@@ -34,6 +35,45 @@ import {
   getGame,
   createGame,
 } from './game'
+
+import {
+  DatabaseContextError,
+} from './errors'
+
+import {
+  Database,
+  objIsDatabase,
+} from '../../../backend/src'
+
+
+export declare type WithDatabase<TSchema> = Omit<TSchema, 'db'> & {
+  db: Database
+}
+
+function contextHasDatabase<TSchema> (context: unknown): context is WithDatabase<TSchema> {
+  let result = false
+  if (typeof context === 'object') {
+    if (objIsDatabase((context as any).db)) {
+      result = true
+    }
+  }
+  return result
+}
+
+// decorator for resolvers
+function withDatabase (resolver?: GraphQLFieldResolver<any, WithDatabase<{}>, any, unknown>) {
+  if (typeof resolver === 'undefined') {
+    return undefined
+  } else {
+    const wrapped: GraphQLFieldResolver<any, unknown, any, unknown> = (parent, args, context, info) => {
+      if (!contextHasDatabase(context)) {
+        throw new DatabaseContextError()
+      }
+      return resolver(parent, args, context, info)
+    }
+    return wrapped
+  }
+}
 
 /**
  * Using our shorthand to describe type systems, the type system for our
@@ -454,13 +494,9 @@ const { connectionType: GameConnection } = connectionDefinitions({
  const queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
-    gameById: {
+    game: {
       type: GameType,
       resolve: (parent, args, context, info) => { console.warn('unimplemented'); return getGame('0') },
-    },
-    gameByTag: {
-      type: GameType,
-      resolve: () => { console.warn('unimplemented'); return getGame('0') },
     },
     player: {
       type: PlayerType,
@@ -475,10 +511,12 @@ const { connectionType: GameConnection } = connectionDefinitions({
     },
     meta: {
       type: MetaType,
-      resolve: (parent, args, context, info) => {
-        console.log({parent, args, info})
+      resolve: withDatabase((parent, args, context, info) => {
+        // console.log({parent, args, info})
+        console.log({ context })
+
         return getMeta('naught')
-      },
+      }),
     },
     node: nodeField,
   }),

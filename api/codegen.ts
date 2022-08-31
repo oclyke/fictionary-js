@@ -28,12 +28,17 @@ async function run () {
   // use the schema SDL definition to generate types
   const config = {
     schema: schemaSDL,
-    // documents: './src/**/*.graphql',
+    documents: path.join(__dirname, 'src/schema/operations/**/*.graphql'),
     generates: {
       [path.join(OUTPUT_DIR, 'types.ts')]: {
+        // documents: [
+        //   'sdf'
+        // ],
         plugins: [
           'typescript',
           'typescript-resolvers',
+          'typescript-operations',
+          'typed-document-node',
           // 'typescript-mongodb',
         ],
         // config: {
