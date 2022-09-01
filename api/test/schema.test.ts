@@ -142,7 +142,7 @@ test('meta scalars', async () => {
   `
   const { data, errors } = await graphql({ schema, source, contextValue })
   expect(errors).toBeUndefined()
-  const meta = (data as any).meta
+  const meta = (data as any).meta // this cast to any is kind of nasty... see https://github.com/dotansimha/graphql-typed-document-node/issues/68
   expect(meta.name).toBe(initial_data.meta.name)
   expect(meta.description).toBe(initial_data.meta.description)
 })
