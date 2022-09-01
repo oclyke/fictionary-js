@@ -1,53 +1,166 @@
-// import type {
-//   Game,
-//   Word,
-//   PlayerConnection,
-// } from '../generated/graphql'
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLInt,
+} from 'graphql'
 
-type Game = any
+import {
+  globalIdField,
+  connectionFromArray,
+  connectionArgs,
+  connectionDefinitions,
+  mutationWithClientMutationId,
+} from 'graphql-relay'
 
-// meta is hardcoded right now
-import { getMeta } from './meta'
-const meta = getMeta('naught')
+import {
+  nodeInterface,
+} from './node'
 
+import {
+  PlayerConnection,
+} from './player'
 
+import {
+  WordType,
+} from './word'
 
+/**
+ * Define the Game type.
+ *
+ * This implements the following type system shorthand:
+ * type Game : Node {
+ *   id: ID!
+ *   name: String!
+ *   players: PlayerConnection
+ *   words: [Word!]!
+ *   scores: [ScoreTuple!]!
+ *   created: String!
+ *   updated: String!
 
-let nextGameId = 0
-function getGameId () {
-  const id = nextGameId
-  nextGameId += 1
-  return String(id)
-}
+ *   addPlayer(userid: ID!): AddPlayerPayload
+ * }
+ */
+export const GameType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'Game',
+  description: 'Definition of a word.',
+  interfaces: [nodeInterface],
+  fields: () => ({
+    id: globalIdField(),
+    name: {
+      type: GraphQLString,
+      description: 'The name of the game.',
+    },
+    players: {
+      type: PlayerConnection,
+      description: 'Connection to players who participated in the game.',
+      args: connectionArgs,
+      resolve: (game, args) =>
+        // connectionFromArray(game.players.map(getPlayer), args),
+        null,
+    },
+    words: {
+      type: new GraphQLList(WordType),
+      description: 'Words of the game.',
+      resolve: (game, args) =>
+        connectionFromArray(game.words, args),
+    },
+    scores: {
+      type: new GraphQLList(ScoreTupleType),
+      description: 'Words of the game.',
+      resolve: (game, args) =>
+        connectionFromArray(game.words, args),
+    },
+    created: {
+      type: GraphQLString,
+      description: 'Date of game creation.',
+    },
+    updated: {
+      type: GraphQLString,
+      description: 'Date when game was last updated.',
+    },
+  }),
+});
 
-function makeGame (name: string): Game {
-  if (typeof meta === 'undefined') {
-    throw new Error('could not get root meta type')
-  }
-  return ({
-    id: getGameId(),
-    name,
-    players: null,
-    words: [],
-    scores: [],
-    created: new Date().toDateString(),
-    updated: new Date().toDateString(),
-  })
-}
+/**
+ * We define a connection to Games.
+ *
+ * connectionType implements the following type system shorthand:
+ *   type GameConnection {
+ *     edges: [GameEdge]
+ *     pageInfo: PageInfo!
+ *   }
+ *
+ * connectionType has an edges field - a list of edgeTypes that implement the
+ * following type system shorthand:
+ *   type GameEdge {
+ *     cursor: String!
+ *     node: Game
+ *   }
+ */
+export const { connectionType: GameConnection } = connectionDefinitions({
+  nodeType: GameType,
+});
 
-const allGames: Game[] = [...new Array(7)].map((_, idx) => makeGame(`game-name-${idx}`))
+/**
+ * Define the ScoreTuple type.
+ *
+ * This implements the following type system shorthand:
+ * type ScoreTuple {
+ *   id: ID!         # id of player
+ *   score: Int!     # score of the player
+ * }
+ */
+const ScoreTupleType: GraphQLObjectType = new GraphQLObjectType({
+  name: 'ScoreTuple',
+  description: 'Scoring information.',
+  fields: () => ({
+    id: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The ID of the player whose score is recorded in the tuple.',
+    },
+    score: {
+      type: new GraphQLNonNull(GraphQLInt),
+      description: 'The score associated with this ID.',
+    },
+  }),
+});
 
-
-export function getGame(id: string) {
-  const game = allGames.find(g => g.id === id)
-  if(typeof game === 'undefined'){
+/**
+ * This will return a GraphQLFieldConfig for our createGame
+ * mutation.
+ *
+ * It creates these two types implicitly:
+ *   input CreateGameInput {
+ *     clientMutationId: string
+ *     name: string!
+ *   }
+ *
+ *   type CreateGamePayload {
+ *     clientMutationId: string
+ *     game: Game
+ *   }
+ */
+export const createGameMutation = mutationWithClientMutationId({
+  name: 'CreateGame',
+  inputFields: {
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+  },
+  outputFields: {
+    game: {
+      type: GameType,
+      // resolve: (payload) => getGame(payload.gameid),
+      resolve: (payload) => null,
+    },
+  },
+  mutateAndGetPayload: ({ name }) => {
+    // const newGame = createGame(name);
+    // return {
+    //   gameid: newGame.id,
+    // };
     return null
-  }
-  return game
-}
-
-export function createGame(name: string) {
-  const game = makeGame(name)
-  game.name = name
-  return game
-}
+  },
+});

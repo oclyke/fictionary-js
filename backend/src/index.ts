@@ -20,7 +20,11 @@ export interface Database {
   meta: Collection<MetaModel>
 }
 
-export function objIsDatabase (obj: any): obj is Database {
+export declare type WithDatabase<TSchema> = Omit<TSchema, 'db'> & {
+  db: Database
+}
+
+export function isDatabase (obj: any): obj is Database {
   let result = false
   if (typeof obj === 'object') {
     if ( true
