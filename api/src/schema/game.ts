@@ -4,12 +4,12 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLInt,
+  GraphQLInputObjectType,
 } from 'graphql'
 
 import {
   globalIdField,
   connectionFromArray,
-  connectionArgs,
   connectionDefinitions,
   mutationWithClientMutationId,
 } from 'graphql-relay'
@@ -20,11 +20,22 @@ import {
 
 import {
   PlayerConnection,
+  PlayerFilterInputType,
 } from './player'
 
 import {
   WordType,
 } from './word'
+
+import {
+  resolverWithDatabase,
+  PaginationInputType,
+  StringFilterInputType,
+} from './utils'
+
+import {
+  UnimplementedError,
+} from './errors'
 
 /**
  * Define the Game type.
@@ -55,10 +66,49 @@ export const GameType: GraphQLObjectType = new GraphQLObjectType({
     players: {
       type: PlayerConnection,
       description: 'Connection to players who participated in the game.',
-      args: connectionArgs,
-      resolve: (game, args) =>
-        // connectionFromArray(game.players.map(getPlayer), args),
-        null,
+      args: {
+        paged: {
+          type: PaginationInputType,
+        },
+        filter: {
+          type: PlayerFilterInputType,
+        }
+      },
+      resolve: resolverWithDatabase( async (game, args, context, info) => {
+        if (typeof args.paged !== 'undefined') {
+          throw new UnimplementedError('pagination for players on Game')
+        }
+        if (typeof args.filter !== 'undefined') {
+          throw new UnimplementedError('filter for players on Game')
+        }
+        console.log('heres where you should pay attention to pagination and filtering of connections!')
+        const player_ids_subset = game.players // eventually we will be able to choose a subset according to pagination and filter requests
+
+        const cursor = context.db.users.find({_id: {$in: player_ids_subset }})
+        
+        // i am also not sure exactly how the server should decide how many documents to return to the client -- 
+        // it seems like it could be arbitrary??? (e.g. the client asks for 10e13 but the server says thats whack
+        // and just gives it 69 instead...)
+        // oh well, for now I will make the cursor into an array and return that haha
+        const users = await cursor.toArray()
+
+        // it would be nice to build a generic "connectionFromMongoDbCursor" function in the future...
+        return {
+          pageInfo: {
+            start: 'the beginning cursor',
+            end: 'the conclusion cursor',
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+          edges: users.map(u => ({
+            node: {
+              ...u,
+              id: u._id.toString(),
+            },
+            cursor: u._id.toString(), // I'm not sure if I can just use the mongodb id as the cursor... need to check on this
+          }))
+        }
+      }),
     },
     words: {
       type: new GraphQLList(WordType),
@@ -164,3 +214,15 @@ export const createGameMutation = mutationWithClientMutationId({
     return null
   },
 });
+
+/**
+ * Define a filter type for Players.
+ */
+ export const GameFilterInputType = new GraphQLInputObjectType({
+  name: 'GameFilterInput',
+  fields: () => ({
+    name: {
+      type: StringFilterInputType,
+    },
+  }),
+})

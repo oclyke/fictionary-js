@@ -31,29 +31,19 @@ import {
 } from '../../backend/src/meta'
 
 import {
-  Meta,
-
-  GetGameDocument,
-  GetGameQuery,
-  GetGameQueryVariables,
-
   GetMetaDocument,
-  GetMetaQuery,
-  GetMetaQueryVariables,
 } from '../src/generated/schema/types'
 
 import {
   Database,
-  MetaModel,
-  UserModel,
-  GameModel,
-
   getDatabase,
   initializeDatabase,
-  
 } from '../../backend/src'
 
-
+import {
+  InitialData,
+  createInitialData,
+} from '../src/mocking'
 
 let client: MongoClient
 let replset: MongoMemoryReplSet
@@ -63,19 +53,7 @@ type ContextType = {
 }
 let contextValue: ContextType
 
-type InitialData = {
-  meta: Partial<MetaModel>
-  games: GameModel[]
-  users: UserModel[]
-}
-const initial_data: InitialData = {
-  meta: {
-    name: 'fictionary-api-schema-test',
-    description: 'a version of the fictionary database used for testing the schema',
-  },
-  games: [],
-  users: [],
-}
+let initial_data: InitialData
 
 // see docs on jest setup / teardown as well as handling async code
 // https://jestjs.io/docs/setup-teardown
@@ -94,15 +72,7 @@ beforeAll(async () => {
     db,
   }
 
-  // set up mock data
-  // // meta
-  await ensureMeta(db)
-  await updateMeta(db, initial_data.meta)
-
-  // // games
-
-
-
+  initial_data = await createInitialData(db)
 })
 
 afterAll(async () => {

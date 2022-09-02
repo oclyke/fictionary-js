@@ -2,6 +2,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
+  GraphQLInputObjectType,
 } from 'graphql'
 
 import {
@@ -17,7 +18,18 @@ import {
 
 import {
   GameConnection,
+  GameFilterInputType,
 } from './game'
+
+import {
+  resolverWithDatabase,
+  StringFilterInputType,
+  PaginationInputType,
+} from './utils'
+
+import {
+  UnimplementedError,
+} from './errors'
 
 /**
  * Define the Player type.
@@ -67,10 +79,42 @@ export const PlayerType: GraphQLObjectType = new GraphQLObjectType({
     games: {
       type: GameConnection,
       description: 'Individual Games of fictionary.',
-      args: connectionArgs,
-      resolve: (meta, args) =>
-        // connectionFromArray(meta.games.map(getGame), args),
-        null,
+      args: {
+        paged: {
+          type: PaginationInputType,
+        },
+        filter: {
+          type: GameFilterInputType,
+        }
+      },
+      resolve: resolverWithDatabase( async (player, args, context, info) => {
+        if (typeof args.paged !== 'undefined') {
+          throw new UnimplementedError('pagination for games on Player')
+        }
+        if (typeof args.filter !== 'undefined') {
+          throw new UnimplementedError('filter for games on Player')
+        }
+
+        const game_ids_subset = player.games // eventually we will be able to choose a subset according to pagination and filter requests
+        const cursor = context.db.games.find({_id: {$in: game_ids_subset }})
+        // once again this is *NOT* the ideal way to do this - need to find a reasonable way for the server to decide how many documents 
+        // to return at once (or possibly just assume a small number like 5 and rely on the client to specify larger values when needed)
+        const games = await cursor.toArray()
+
+        return {
+          edges: games.map(g => ({
+            node: {
+              ...g,
+              id: g._id.toString(),
+            },
+            cursor: g._id.toString(),
+          })),
+          pageInfo: {
+            startCursor: 'seventeen',
+            endCursor: 'twenty-six',
+          }
+        }
+      }),
     },
   }),
 });
@@ -93,14 +137,24 @@ export const PlayerType: GraphQLObjectType = new GraphQLObjectType({
  */
 export const { connectionType: PlayerConnection } = connectionDefinitions({
   nodeType: PlayerType,
+  // resolveCursor: (parent, args, context, info) => {
+  //   // using the resolveCursor resolver could... uh... well I just don't quite know yet!
+  // },
+  // resolveNode: (parent, args, context, info) => {
+  //   // using the resolveNode resolver could be helpful if, perhaps, the node type
+  //   // was nonstandard or if there were edge-related information to extract?
+  // }
 });
 
 
-// the Player type holds information about fictionary players
-interface Player {
-  id: string
-  name: string
-  color: string
-  overallScore: number
-  // gamesHistoryConnection: GameConnection
-}
+/**
+ * Define a filter type for Players.
+ */
+export const PlayerFilterInputType = new GraphQLInputObjectType({
+  name: 'PlayerFilterInput',
+  fields: () => ({
+    name: {
+      type: StringFilterInputType,
+    },
+  }),
+})

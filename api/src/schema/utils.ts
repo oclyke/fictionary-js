@@ -1,6 +1,13 @@
 import {
   GraphQLFieldResolver,
+  GraphQLInputObjectType,
+  GraphQLString,
+  GraphQLList,
 } from 'graphql'
+
+import {
+  connectionArgs,
+} from 'graphql-relay'
 
 import {
   DatabaseContextError,
@@ -35,3 +42,34 @@ export function resolverWithDatabase (resolver?: GraphQLFieldResolver<any, WithD
     return wrapped
   }
 }
+
+export const StringFilterInputType = new GraphQLInputObjectType({
+  name: 'StringFilterInput',
+  fields: () => ({
+    eq: {
+      type: GraphQLString,
+    },
+    neq: {
+      type: GraphQLString,
+    },
+    in: {
+      type: new GraphQLList(GraphQLString),
+    },
+    nin: {
+      type: new GraphQLList(GraphQLString),
+    },
+    glob: {
+      type: GraphQLString,
+    },
+    regex: {
+      type: GraphQLString,
+    },
+  }),
+})
+
+export const PaginationInputType = new GraphQLInputObjectType({
+  name: 'PaginationInput',
+  fields: () => ({
+    ...connectionArgs,
+  }),
+})

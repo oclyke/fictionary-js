@@ -1,5 +1,5 @@
 type Query {
-  game: Game
+  game(id: ID, name: String): Game
   player: Player
   meta: Meta
 
@@ -19,19 +19,7 @@ type Game implements Node {
   name: String
 
   """Connection to players who participated in the game."""
-  players(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): PlayerConnection
+  players(paged: PaginationInput, filter: PlayerFilterInput): PlayerConnection
 
   """Words of the game."""
   words: [Word]
@@ -100,19 +88,7 @@ type Player implements Node {
   overallScore: Int
 
   """Individual Games of fictionary."""
-  games(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): GameConnection
+  games(paged: PaginationInput, filter: GameFilterInput): GameConnection
 }
 
 """A connection to a list of items."""
@@ -133,9 +109,40 @@ type GameEdge {
   cursor: String!
 }
 
+input PaginationInput {
+  """Returns the items in the list that come after the specified cursor."""
+  after: String
+
+  """Returns the first n items from the list."""
+  first: Int
+
+  """Returns the items in the list that come before the specified cursor."""
+  before: String
+
+  """Returns the last n items from the list."""
+  last: Int
+}
+
+input GameFilterInput {
+  name: StringFilterInput
+}
+
+input StringFilterInput {
+  eq: String
+  neq: String
+  in: [String]
+  nin: [String]
+  glob: String
+  regex: String
+}
+
+input PlayerFilterInput {
+  name: StringFilterInput
+}
+
 """In-game Word information."""
 type Word {
-  """the """
+  """the word"""
   value: String!
 
   """The ID of the author of the Word."""
@@ -205,19 +212,7 @@ type Meta implements Node {
   description: String
 
   """The Players who have played fictionary."""
-  players(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): PlayerConnection
+  players(paged: PaginationInput, filter: PlayerFilterInput): PlayerConnection
 
   """Individual Games of fictionary."""
   games(

@@ -1,6 +1,7 @@
 import {
   GraphQLObjectType,
   GraphQLString,
+  GraphQLInputObjectType,
 } from 'graphql'
 
 import {
@@ -15,11 +16,16 @@ import {
 
 import {
   PlayerConnection,
+  PlayerFilterInputType,
 } from './player'
 
 import {
   GameConnection,
 } from './game'
+
+import {
+  PaginationInputType,
+} from './utils'
 
 /**
  * Define the Meta type.
@@ -49,10 +55,30 @@ export const MetaType: GraphQLObjectType = new GraphQLObjectType({
     players: {
       type: PlayerConnection,
       description: 'The Players who have played fictionary.',
-      args: connectionArgs,
+      args: {
+        paged: {
+          type: PaginationInputType,
+        },
+        filter: {
+          type: PlayerFilterInputType,
+        }
+      },
       resolve: (meta, args) => {
-        // return connectionFromArray(meta.players.map(getPlayer), args)
-        return null
+        if (args.paged) {
+          // handle pagination requests here
+        }
+        if (args.filter) {
+          // handle filter requests here
+        }
+        return {
+          pageInfo: {
+            start: 'start cursor',
+            end: 'end cursor',
+            hasNextPage: false,
+            hasPreviousPage: false,
+          },
+          edges: [1, 69], // you would instead use use a query on mongodb here to transform some cursor into the edges which to return
+        }
       },
     },
     games: {

@@ -14,3 +14,10 @@ export class DatabaseContextError extends ContextError {
     super(message)
   }
 }
+
+export class UnimplementedError extends GraphQLError {
+  constructor(message = "", ...args: []) {
+    super(message, ...args);
+    this.message = message + " has not yet been implemented.";
+  }
+}

@@ -21,11 +21,9 @@ import {
 
 import {
   Database,
-} from '../../backend/src'
-
-import {
   getDatabase,
-} from '../../backend/src/utils';
+  initializeDatabase,
+} from '../../backend/src'
 
 import {
   schema,
@@ -34,6 +32,10 @@ import {
 import {
   start_wss
 } from './sessions';
+
+import {
+  createInitialData,
+} from './mocking'
 
 // let's drop Apollo - they seem a little too hand-holdy for me
 // (but thanks Apollo - I did start graphql learning with your tutorials after all)
@@ -66,6 +68,10 @@ const run = async () => {
     console.error('ERROR - db client not connected - ', e);
   }
   db = getDatabase(client);
+
+  if (process.env.NODE_ENV === 'development') {
+    await createInitialData(db)
+  }
 
   // websocket server
   const SESSION_PORT = (typeof process.env.SESSION_PORT !== 'undefined') ? parseInt(process.env.SESSION_PORT) : DEFAULT_SESSION_PORT;

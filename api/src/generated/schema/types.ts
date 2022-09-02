@@ -57,10 +57,8 @@ export type Game = Node & {
 
 /** Definition of a word. */
 export type GamePlayersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<PlayerFilterInput>;
+  paged?: InputMaybe<PaginationInput>;
 };
 
 /** A connection to a list of items. */
@@ -79,6 +77,10 @@ export type GameEdge = {
   cursor: Scalars['String'];
   /** The item at the end of the edge */
   node?: Maybe<Game>;
+};
+
+export type GameFilterInput = {
+  name?: InputMaybe<StringFilterInput>;
 };
 
 /** Meta information about fictionary. */
@@ -108,10 +110,8 @@ export type MetaGamesArgs = {
 
 /** Meta information about fictionary. */
 export type MetaPlayersArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<PlayerFilterInput>;
+  paged?: InputMaybe<PaginationInput>;
 };
 
 export type Mutation = {
@@ -143,6 +143,17 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']>;
 };
 
+export type PaginationInput = {
+  /** Returns the items in the list that come after the specified cursor. */
+  after?: InputMaybe<Scalars['String']>;
+  /** Returns the items in the list that come before the specified cursor. */
+  before?: InputMaybe<Scalars['String']>;
+  /** Returns the first n items from the list. */
+  first?: InputMaybe<Scalars['Int']>;
+  /** Returns the last n items from the list. */
+  last?: InputMaybe<Scalars['Int']>;
+};
+
 /** Player information. */
 export type Player = Node & {
   __typename?: 'Player';
@@ -161,10 +172,8 @@ export type Player = Node & {
 
 /** Player information. */
 export type PlayerGamesArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  before?: InputMaybe<Scalars['String']>;
-  first?: InputMaybe<Scalars['Int']>;
-  last?: InputMaybe<Scalars['Int']>;
+  filter?: InputMaybe<GameFilterInput>;
+  paged?: InputMaybe<PaginationInput>;
 };
 
 /** A connection to a list of items. */
@@ -185,6 +194,10 @@ export type PlayerEdge = {
   node?: Maybe<Player>;
 };
 
+export type PlayerFilterInput = {
+  name?: InputMaybe<StringFilterInput>;
+};
+
 export type Query = {
   __typename?: 'Query';
   game?: Maybe<Game>;
@@ -192,6 +205,12 @@ export type Query = {
   /** Fetches an object given its ID */
   node?: Maybe<Node>;
   player?: Maybe<Player>;
+};
+
+
+export type QueryGameArgs = {
+  id?: InputMaybe<Scalars['ID']>;
+  name?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -206,6 +225,15 @@ export type ScoreTuple = {
   id: Scalars['String'];
   /** The score associated with this ID. */
   score: Scalars['Int'];
+};
+
+export type StringFilterInput = {
+  eq?: InputMaybe<Scalars['String']>;
+  glob?: InputMaybe<Scalars['String']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  neq?: InputMaybe<Scalars['String']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  regex?: InputMaybe<Scalars['String']>;
 };
 
 /** Word state information. */
@@ -226,7 +254,7 @@ export type Word = {
   definitions: Array<DefinitionTuple>;
   /** The Word state. */
   state: WordState;
-  /** the  */
+  /** the word */
   value: Scalars['String'];
   /** IDs of players who are allowed to vote on this Word. */
   voters: Array<Scalars['String']>;
@@ -320,18 +348,22 @@ export type ResolversTypes = {
   Game: ResolverTypeWrapper<Game>;
   GameConnection: ResolverTypeWrapper<GameConnection>;
   GameEdge: ResolverTypeWrapper<GameEdge>;
+  GameFilterInput: GameFilterInput;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Meta: ResolverTypeWrapper<Meta>;
   Mutation: ResolverTypeWrapper<{}>;
   Node: ResolversTypes['Game'] | ResolversTypes['Meta'] | ResolversTypes['Player'];
   PageInfo: ResolverTypeWrapper<PageInfo>;
+  PaginationInput: PaginationInput;
   Player: ResolverTypeWrapper<Player>;
   PlayerConnection: ResolverTypeWrapper<PlayerConnection>;
   PlayerEdge: ResolverTypeWrapper<PlayerEdge>;
+  PlayerFilterInput: PlayerFilterInput;
   Query: ResolverTypeWrapper<{}>;
   ScoreTuple: ResolverTypeWrapper<ScoreTuple>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  StringFilterInput: StringFilterInput;
   VoteTuple: ResolverTypeWrapper<VoteTuple>;
   Word: ResolverTypeWrapper<Word>;
   WordState: WordState;
@@ -346,18 +378,22 @@ export type ResolversParentTypes = {
   Game: Game;
   GameConnection: GameConnection;
   GameEdge: GameEdge;
+  GameFilterInput: GameFilterInput;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
   Meta: Meta;
   Mutation: {};
   Node: ResolversParentTypes['Game'] | ResolversParentTypes['Meta'] | ResolversParentTypes['Player'];
   PageInfo: PageInfo;
+  PaginationInput: PaginationInput;
   Player: Player;
   PlayerConnection: PlayerConnection;
   PlayerEdge: PlayerEdge;
+  PlayerFilterInput: PlayerFilterInput;
   Query: {};
   ScoreTuple: ScoreTuple;
   String: Scalars['String'];
+  StringFilterInput: StringFilterInput;
   VoteTuple: VoteTuple;
   Word: Word;
 };
@@ -445,7 +481,7 @@ export type PlayerEdgeResolvers<ContextType = any, ParentType extends ResolversP
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  game?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType>;
+  game?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, Partial<QueryGameArgs>>;
   meta?: Resolver<Maybe<ResolversTypes['Meta']>, ParentType, ContextType>;
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
   player?: Resolver<Maybe<ResolversTypes['Player']>, ParentType, ContextType>;
@@ -493,10 +529,19 @@ export type Resolvers<ContextType = any> = {
 };
 
 
-export type GetGameQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetGameByIdQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 
-export type GetGameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string } | null };
+export type GetGameByIdQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string } | null };
+
+export type GetGameByNameQueryVariables = Exact<{
+  name: Scalars['String'];
+}>;
+
+
+export type GetGameByNameQuery = { __typename?: 'Query', game?: { __typename?: 'Game', id: string } | null };
 
 export type GameFieldsFragment = { __typename?: 'Game', id: string };
 
@@ -506,5 +551,6 @@ export type GetMetaQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetMetaQuery = { __typename?: 'Query', meta?: { __typename?: 'Meta', id: string, name?: string | null, description?: string | null } | null };
 
 export const GameFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"GameFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Game"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]} as unknown as DocumentNode<GameFieldsFragment, unknown>;
-export const GetGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getGame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"GameFields"}}]}}]}},...GameFieldsFragmentDoc.definitions]} as unknown as DocumentNode<GetGameQuery, GetGameQueryVariables>;
+export const GetGameByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getGameById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"GameFields"}}]}}]}},...GameFieldsFragmentDoc.definitions]} as unknown as DocumentNode<GetGameByIdQuery, GetGameByIdQueryVariables>;
+export const GetGameByNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getGameByName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"GameFields"}}]}}]}},...GameFieldsFragmentDoc.definitions]} as unknown as DocumentNode<GetGameByNameQuery, GetGameByNameQueryVariables>;
 export const GetMetaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getMeta"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"meta"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<GetMetaQuery, GetMetaQueryVariables>;

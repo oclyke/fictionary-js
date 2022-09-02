@@ -1,5 +1,11 @@
-query getGame {
-  game {
+query getGameById($id: ID!) {
+  game(id: $id) {
+    ...GameFields
+  }
+}
+
+query getGameByName($name: String!) {
+  game(name: $name) {
     ...GameFields
   }
 }

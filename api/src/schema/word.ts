@@ -25,7 +25,9 @@ export const WordType: GraphQLObjectType = new GraphQLObjectType({
   fields: () => ({
     value: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'the '
+      description: 'the word',
+      resolve: (parent, args, context, info) =>
+        'knee'
     },
     authorid: {
       type: new GraphQLNonNull(GraphQLString),

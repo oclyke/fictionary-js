@@ -1,8 +1,13 @@
 import {
   GraphQLObjectType,
   GraphQLSchema,
+  GraphQLString,
+  GraphQLID,
 } from 'graphql'
 
+import {
+  ObjectId,
+} from 'mongodb'
 
 import {
   MetaType,
@@ -24,6 +29,15 @@ import {
 import {
   resolverWithDatabase,
 } from './utils'
+
+import {
+  getGame,
+  getGameByName,
+} from '../../../backend/src/game'
+
+// trying to ensure efficient pagination of the returned data
+// https://www.reindex.io/blog/relay-graphql-pagination-with-mongodb/
+// https://blog.logrocket.com/properly-designed-graphql-resolvers/
 
 /**
  * Using our shorthand to describe type systems, the type system for our
@@ -48,7 +62,25 @@ const queryType = new GraphQLObjectType({
   fields: () => ({
     game: {
       type: GameType,
-      resolve: (parent, args, context, info) => { console.warn('unimplemented'); /* return getGame('0') */ return null },
+      args: {
+        id: {
+          type: GraphQLID,
+        },
+        name: {
+          type: GraphQLString,
+        },
+      },
+      resolve: resolverWithDatabase(async (parent, {id, name}, context, info) => {
+        let filter: {name?: string, _id?: ObjectId} = {}
+        if (typeof name !== 'undefined') { filter.name = name }
+        if (typeof id !== 'undefined') { filter._id = new ObjectId(id) }
+        const game = await context.db.games.findOne(filter)
+        if (!game) { return null }
+        return {
+          ...game,
+          id: game._id.toString(),
+        }
+      }),
     },
     player: {
       type: PlayerType,
@@ -62,11 +94,8 @@ const queryType = new GraphQLObjectType({
     meta: {
       type: MetaType,
       resolve: resolverWithDatabase((parent, args, context, info) => {
-        // console.log({parent, args, info})
         console.log({ context })
-
-        // return getMeta('naught')
-        return null
+        return 1
       }),
     },
     node: nodeField,
