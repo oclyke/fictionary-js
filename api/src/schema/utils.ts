@@ -1,6 +1,7 @@
 import {
   GraphQLFieldResolver,
   GraphQLInputObjectType,
+  GraphQLResolveInfo,
   GraphQLString,
   GraphQLList,
 } from 'graphql'
@@ -29,18 +30,34 @@ function contextHasDatabase<TSchema> (context: unknown): context is WithDatabase
 }
 
 // decorator for resolvers
-export function resolverWithDatabase (resolver?: GraphQLFieldResolver<any, WithDatabase<{}>, any, unknown>) {
-  if (typeof resolver === 'undefined') {
-    return undefined
-  } else {
-    const wrapped: GraphQLFieldResolver<any, unknown, any, unknown> = (parent, args, context, info) => {
-      if (!contextHasDatabase(context)) {
-        throw new DatabaseContextError()
-      }
-      return resolver(parent, args, context, info)
+export function resolverWithDatabase<Tsource, Tcontext, Targs = any, Tresult=unknown>(resolver: GraphQLFieldResolver<Tsource, WithDatabase<Tcontext>, Targs, Tresult>) {
+  const wrapped: GraphQLFieldResolver<Tsource, Tcontext, Targs, Tresult> = (parent, args, context, info) => {
+    if (!contextHasDatabase(context)) {
+      throw new DatabaseContextError()
     }
-    return wrapped
+    return resolver(parent, args, context, info)
   }
+  return wrapped
+}
+
+type MutatorFn <
+  Targs,
+  Tcontext,
+  Tresult = unknown
+> = (
+  args: Targs,
+  context: WithDatabase<Tcontext>,
+  info: GraphQLResolveInfo
+) => Tresult
+
+export function mutatorWithDatabase<Targs, Tcontext, Tresult = unknown> (mutator: MutatorFn<Targs, Tcontext, Tresult>) {
+  const wrapped: MutatorFn<Targs, Tcontext, Tresult> = (args, context, info) => {
+    if (!contextHasDatabase(context)) {
+      throw new DatabaseContextError()
+    }
+    return mutator(args, context, info)
+  }
+  return wrapped
 }
 
 export const StringFilterInputType = new GraphQLInputObjectType({

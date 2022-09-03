@@ -15,12 +15,18 @@ import {
 } from 'graphql-relay'
 
 import {
+  FindCursor,
+  WithId,
+} from 'mongodb'
+
+import {
   nodeInterface,
 } from './node'
 
 import {
   PlayerConnection,
   PlayerFilterInputType,
+  playerConnectionFromCursor,
 } from './player'
 
 import {
@@ -29,6 +35,7 @@ import {
 
 import {
   resolverWithDatabase,
+  mutatorWithDatabase,
   PaginationInputType,
   StringFilterInputType,
 } from './utils'
@@ -36,6 +43,11 @@ import {
 import {
   UnimplementedError,
 } from './errors'
+
+import {
+  createGame,
+  GameModel,
+} from '../../../backend/src/game'
 
 /**
  * Define the Game type.
@@ -85,29 +97,7 @@ export const GameType: GraphQLObjectType = new GraphQLObjectType({
         const player_ids_subset = game.players // eventually we will be able to choose a subset according to pagination and filter requests
 
         const cursor = context.db.users.find({_id: {$in: player_ids_subset }})
-        
-        // i am also not sure exactly how the server should decide how many documents to return to the client -- 
-        // it seems like it could be arbitrary??? (e.g. the client asks for 10e13 but the server says thats whack
-        // and just gives it 69 instead...)
-        // oh well, for now I will make the cursor into an array and return that haha
-        const users = await cursor.toArray()
-
-        // it would be nice to build a generic "connectionFromMongoDbCursor" function in the future...
-        return {
-          pageInfo: {
-            start: 'the beginning cursor',
-            end: 'the conclusion cursor',
-            hasNextPage: false,
-            hasPreviousPage: false,
-          },
-          edges: users.map(u => ({
-            node: {
-              ...u,
-              id: u._id.toString(),
-            },
-            cursor: u._id.toString(), // I'm not sure if I can just use the mongodb id as the cursor... need to check on this
-          }))
-        }
+        return await playerConnectionFromCursor(cursor)
       }),
     },
     words: {
@@ -202,18 +192,40 @@ export const createGameMutation = mutationWithClientMutationId({
   outputFields: {
     game: {
       type: GameType,
-      // resolve: (payload) => getGame(payload.gameid),
-      resolve: (payload) => null,
+      resolve: async (payload, args, context, info) => payload,
     },
   },
-  mutateAndGetPayload: ({ name }) => {
-    // const newGame = createGame(name);
-    // return {
-    //   gameid: newGame.id,
-    // };
-    return null
-  },
+  mutateAndGetPayload: mutatorWithDatabase(async ({ name }, context, info) => {
+    const game = await createGame(context.db, name)
+    return {
+      ...game,
+      id: game._id.toString(),
+    }
+  }),
 });
+
+export function gameFromModel (model: WithId<GameModel>) {
+  return {
+    ...model,
+    id: model._id.toString()
+  }
+}
+
+export async function gameConnectionFromCursor (cursor: FindCursor<WithId<GameModel>>) {
+  // todo: replace this with a proper way of converting mongodb cursor to games result
+  const games = (await cursor.toArray()).map(gameFromModel)
+
+  return {
+    edges: games.map(g => ({
+      node: g,
+      cursor: g.id,
+    })),
+    pageInfo: {
+      startCursor: 'donkykong',
+      endCursor: 'diddykong',
+    }
+  }
+}
 
 /**
  * Define a filter type for Players.

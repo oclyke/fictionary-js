@@ -1,13 +1,10 @@
 import {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLInputObjectType,
 } from 'graphql'
 
 import {
   globalIdField,
-  connectionFromArray,
-  connectionArgs,
 } from 'graphql-relay'
 
 import {
@@ -17,13 +14,17 @@ import {
 import {
   PlayerConnection,
   PlayerFilterInputType,
+  playerConnectionFromCursor,
 } from './player'
 
 import {
   GameConnection,
+  GameFilterInputType,
+  gameConnectionFromCursor,
 } from './game'
 
 import {
+  resolverWithDatabase,
   PaginationInputType,
 } from './utils'
 
@@ -63,31 +64,34 @@ export const MetaType: GraphQLObjectType = new GraphQLObjectType({
           type: PlayerFilterInputType,
         }
       },
-      resolve: (meta, args) => {
+      resolve: resolverWithDatabase(async (meta, args, context) => {
         if (args.paged) {
           // handle pagination requests here
         }
         if (args.filter) {
           // handle filter requests here
         }
-        return {
-          pageInfo: {
-            start: 'start cursor',
-            end: 'end cursor',
-            hasNextPage: false,
-            hasPreviousPage: false,
-          },
-          edges: [1, 69], // you would instead use use a query on mongodb here to transform some cursor into the edges which to return
-        }
-      },
+        const cursor = context.db.users.find()
+        return await playerConnectionFromCursor(cursor)
+      }),
     },
     games: {
       type: GameConnection,
       description: 'Individual Games of fictionary.',
-      args: connectionArgs,
-      resolve: (meta, args) =>
-        // connectionFromArray(meta.games.map(getGame), args),
-        null,
+      args: {
+        paged: {
+          type: PaginationInputType,
+        },
+        filter: {
+          type: GameFilterInputType,
+        }
+      },
+      resolve: resolverWithDatabase(async (meta, {paged, filter}, context, info) => {
+        // const {first, last, before, after} = paged
+        // const { name } = filter
+        const cursor = context.db.games.find()
+        return await gameConnectionFromCursor(cursor)
+      }),
     },
   }),
 });

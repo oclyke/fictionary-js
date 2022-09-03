@@ -7,10 +7,13 @@ import {
 
 import {
   globalIdField,
-  connectionFromArray,
-  connectionArgs,
   connectionDefinitions,
 } from 'graphql-relay'
+
+import {
+  FindCursor,
+  WithId,
+} from 'mongodb'
 
 import {
   nodeInterface,
@@ -30,6 +33,10 @@ import {
 import {
   UnimplementedError,
 } from './errors'
+
+import {
+  UserModel,
+} from '../../../backend/src/user'
 
 /**
  * Define the Player type.
@@ -146,6 +153,34 @@ export const { connectionType: PlayerConnection } = connectionDefinitions({
   // }
 });
 
+
+export function playerFromModel (model: WithId<UserModel>) {
+  return {
+    ...model,
+    id: model._id.toString()
+  }
+}
+
+export async function playerConnectionFromCursor (cursor: FindCursor<WithId<UserModel>>) {
+  // todo: replace this with a proper way of converting mongodb cursor to games result
+  const users = (await cursor.toArray()).map(playerFromModel)
+
+  // i am also not sure exactly how the server should decide how many documents to return to the client -- 
+  // it seems like it could be arbitrary??? (e.g. the client asks for 10e13 but the server says thats whack
+  // and just gives it 69 instead...)
+  // oh well, for now I will make the cursor into an array and return that haha
+
+  return {
+    edges: users.map(u => ({
+      node: u,
+      cursor: u.id,
+    })),
+    pageInfo: {
+      startCursor: 'seventeen',
+      endCursor: 'twenty-six',
+    }
+  }
+}
 
 /**
  * Define a filter type for Players.
