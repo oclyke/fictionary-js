@@ -1,6 +1,7 @@
 import * as express from 'express'
 import * as playground from 'graphql-playground-middleware-express'
 import * as expressGraphQL from 'express-graphql'
+import * as cors from 'cors'
 
 import {
   WebSocketServer,
@@ -97,7 +98,8 @@ const run = async () => {
   console.log(`session websocket server listening on wss://localhost:${SESSION_PORT}`);
 
   // graphql server
-  const api_server = express();
+  const api_server = express()
+  api_server.use(cors())
   api_server.get(DEFAULT_API_EXPLORER_PATH, playground.default({ endpoint: '/graphql' }))
   api_server.use(
     DEFAULT_API_ENDPOINT_PATH,
