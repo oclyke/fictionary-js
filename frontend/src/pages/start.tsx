@@ -5,17 +5,14 @@ import {
 
 import {
   useNavigate,
-  Navigate,
-  Link,
 } from 'react-router-dom'
+
+import {
+  useQuery,
+} from '@apollo/client'
 
 // @ts-ignore
 import * as greg from 'greg'
-
-import {
-  gqlFetch,
-  makeSingle
-} from '../utils'
 
 import {
   FRONTEND_MAJOR,
@@ -23,23 +20,25 @@ import {
   REPO_URL,
 } from '../constants'
 
+import {
+  GetGameByNameQuery,
+  GetGameByNameDocument,
+  GetGameByNameQueryVariables,
+} from '../generated/schema/types'
+
 export default function () {
   const navigate = useNavigate()
-  const [tag, setTag] = useState<{value: string, exists: boolean}>({value: '', exists: false})
 
-  function* checkTag(tag: string) {
-    // check with server to see if this tag exists
-    const { data: { getRoomByTag: room } } = yield gqlFetch(`query { getRoomByTag(tag: "${tag}"){tag}}`)
-    const exists = room !== null && room.tag === tag
-    setTag(prev => ({...prev, exists }))
-  }
-  const checkTagSingle = makeSingle(checkTag)
+  const [name, setName] = useState<{value: string, validated: string, different: boolean}>({value: '', validated: '', different: false})
+  const { loading, error, data } = useQuery<GetGameByNameQuery, GetGameByNameQueryVariables>(
+    GetGameByNameDocument,
+    { variables: { name: name.value } },
+  )
+  const game_exists = data?.game !== null
 
-  const start = false
   const bull = <span className={'bullet'}>•</span>
 
   return <>
-    {start && <Navigate to={`/${tag}`} replace={true} />}
     <div>
       <div>
         <div>
@@ -49,27 +48,27 @@ export default function () {
           <button onClick={() => {
             const value = suggestTag();
             const validated = validateTag(value);
-            setTag(prev => ({...prev, value: validated})); // set tag immediately
-            checkTagSingle(validated); // check tag for existence w/ preemption
+            setName({value, validated, different: (value !== validated)});
           }}>
             suggest tag
           </button>
           <div>
             <input
+              value={name.value}
               onChange={async e => {
                 const value = e.target.value; // handle the user's typing
                 const validated = validateTag(value);
-                setTag(prev => ({...prev, value: validated})); // set tag immediately
-                checkTagSingle(validated); // check tag for existence w/ preemption
+                setName({value, validated, different: (value !== validated)});
               }}
               onKeyDown={async e => {
                 if (e.key === 'Enter') {
-                  navigate(`/${tag.value}`);
+                  navigate(`/${name.validated}`);
                 }
               }}
             />
-            {tag.exists ? '->' : '+'}
+            {game_exists ? '->' : '+'}
           </div>
+          {name.different && <div><p>WARNING: your game will be created with the name: {name.validated}</p></div>}
           <h2 color='textSecondary' style={{fontSize: 24, marginTop: '16px'}}>
             fic{bull}tion{bull}ar{bull}y
           </h2>
@@ -209,6 +208,6 @@ function suggestTag () {
 }
 
 function validateTag(value: string): string {
-  const validated = value.toLowerCase().replace(' ', '-')
+  const validated = value.trim().replace(/\s+/g,'-').replace(' ', '-').toLowerCase()
   return validated
 }

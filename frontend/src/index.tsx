@@ -10,27 +10,41 @@ import {
   BrowserRouter,
   Routes,
   Route,
-} from 'react-router-dom';
+} from 'react-router-dom'
+
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  gql,
+} from '@apollo/client'
 
 import {
   Game,
   Start,
   User,
   Leaderboard,
-} from './pages';
+} from './pages'
 
 import {
   Layout,
-} from './components/layout';
+} from './components/layout'
 
 import {
   FRONTEND_BASENAME,
+  GQL_ENDPOINT,
 } from './constants'
+
+const client = new ApolloClient({
+  uri: GQL_ENDPOINT,
+  cache: new InMemoryCache(),
+})
 
 const container = document.getElementById('root')
 const root = createRoot(container)
 root.render(
   <React.StrictMode>
+    <ApolloProvider client={client}>
     {/* <ThemeProvider theme={theme}> */}
       {/* <CssBaseline/> */}
       <BrowserRouter basename={FRONTEND_BASENAME}>
@@ -44,5 +58,6 @@ root.render(
         </Routes>
       </BrowserRouter>
     {/* </ThemeProvider> */}
+    </ApolloProvider>,
   </React.StrictMode>
 )

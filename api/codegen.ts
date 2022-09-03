@@ -14,6 +14,10 @@ import {
 } from './src/schema'
 
 const OUTPUT_DIR = path.join(__dirname, 'src/generated/schema')
+const type_files = [
+  path.join(__dirname, 'src/generated/schema/types.ts'),
+  path.join(__dirname, '../frontend/src/generated/schema/types.ts'),
+]
 
 async function run () {
   console.log('node is running version: ', process.version)
@@ -29,23 +33,17 @@ async function run () {
   const config = {
     schema: schemaSDL,
     documents: path.join(__dirname, 'src/schema/operations/**/*.graphql'),
-    generates: {
-      [path.join(OUTPUT_DIR, 'types.ts')]: {
-        // documents: [
-        //   'sdf'
-        // ],
+    generates: type_files.reduce((acc: any, file) => {
+      acc[file] = {
         plugins: [
           'typescript',
           'typescript-resolvers',
           'typescript-operations',
           'typed-document-node',
-          // 'typescript-mongodb',
         ],
-        // config: {
-        //   avoidOptionals: true,
-        // }
       }
-    }
+      return acc
+    }, {}),
   }
   const generatedFiles = await generate(config, true) // true option allows 'generate' to save the files to disk
 

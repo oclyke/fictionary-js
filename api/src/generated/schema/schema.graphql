@@ -215,19 +215,7 @@ type Meta implements Node {
   players(paged: PaginationInput, filter: PlayerFilterInput): PlayerConnection
 
   """Individual Games of fictionary."""
-  games(
-    """Returns the items in the list that come after the specified cursor."""
-    after: String
-
-    """Returns the first n items from the list."""
-    first: Int
-
-    """Returns the items in the list that come before the specified cursor."""
-    before: String
-
-    """Returns the last n items from the list."""
-    last: Int
-  ): GameConnection
+  games(paged: PaginationInput, filter: GameFilterInput): GameConnection
 }
 
 type Mutation {
