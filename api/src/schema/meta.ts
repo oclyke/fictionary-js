@@ -1,4 +1,6 @@
 import {
+  GraphQLID,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql'
@@ -35,6 +37,7 @@ import {
  * type Meta : Node {
  *   id: ID!
  *   name: String
+ *   description
  *   games(input: listRoomsInput, first: Int, last: Int, after: String, before: String): GameConnection
  *   players(input: listPlayersInput, first: Int, last: Int, after: String, before: String): PlayerConnection
  * }
@@ -44,14 +47,21 @@ export const MetaType: GraphQLObjectType = new GraphQLObjectType({
   description: 'Meta information about fictionary.',
   interfaces: [nodeInterface],
   fields: () => ({
-    id: globalIdField(),
+    id: globalIdField('MetaType', () => 1),
     name: {
       type: GraphQLString,
       description: 'The name of fictionary.',
+      resolve: () => 'Fictionary',
     },
     description: {
       type: GraphQLString,
       description: 'The description of fictionary.',
+      resolve: () => 'a game of camouflage, misdirection, and astonishment in which players guess the true definition of obscure words',
+    },
+    version: {
+      type: GraphQLString,
+      description: 'The version of the fictionary API.',
+      resolve: () => 'v0.0.0',
     },
     players: {
       type: PlayerConnection,

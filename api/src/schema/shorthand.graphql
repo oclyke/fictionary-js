@@ -16,6 +16,8 @@ type Mutation {
 type Meta : Node {
   id: ID!
   name: String
+  description: String
+  version: String
   games(input: listGamesInput, first: Int, last: Int, after: String, before: String): GameConnection
   players(input: listPlayersInput, first: Int, last: Int, after: String, before: String): PlayerConnection
 }
